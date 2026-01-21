@@ -1,4 +1,5 @@
 package org.api.workaround.model;
 
-public record FileRequest() {
-}
+import org.springframework.web.multipart.MultipartFile;
+
+public record FileRequest(MultipartFile file) {}
