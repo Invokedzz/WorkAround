@@ -2,6 +2,7 @@ package org.api.workaround.exception.handler;
 
 import org.api.workaround.exception.FailedExtractionException;
 import org.api.workaround.exception.FileValidationException;
+import org.api.workaround.exception.InvalidFileException;
 import org.api.workaround.exception.UnableToCreateDirectoryException;
 import org.api.workaround.model.ExceptionResponse;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UnableToCreateDirectoryException.class)
+    @ExceptionHandler({UnableToCreateDirectoryException.class, InvalidFileException.class})
     public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
         var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);

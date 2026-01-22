@@ -13,5 +13,6 @@ public record ExtractionInformation(
         @JsonProperty("file_size")
         String fileSize,
         RARVersion version,
+        @JsonProperty("header_info")
         RarHeaderProperties header
 ) {}

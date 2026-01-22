@@ -34,7 +34,7 @@ public class RarValidation extends ValidationUtility {
         }
 
         if (!isHeaderValid(file)) {
-            messages.add("Oops! Work Around does not support V5 versions. Only V4 or lower.");
+            messages.add("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.");
         }
 
         ThrowsIfMessageListIsNotEmpty(messages);
@@ -47,7 +47,7 @@ public class RarValidation extends ValidationUtility {
     private static boolean isHeaderValid(MultipartFile file) {
         try {
             byte [] bytes = file.getResource().getContentAsByteArray();
-            if (bytes[0] == 0x52) {
+            if (bytes.length >= 4 && bytes[0] == 0x52) {
                 if (isRarVersionV5(bytes)) {
                     return false;
                 }
@@ -64,7 +64,7 @@ public class RarValidation extends ValidationUtility {
         return false;
     }
 
-    private static boolean isRarVersionV5(byte [] contentAsByte) {
+    private static boolean isRarVersionV5(byte... contentAsByte) {
         return contentAsByte[6] == 0x01;
     }
 }
