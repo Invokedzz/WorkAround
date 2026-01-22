@@ -1,6 +1,7 @@
 package org.api.workaround.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.junrar.rarfile.RARVersion;
 
 public record ExtractionInformation(
         @JsonProperty("file_name")
@@ -10,6 +11,7 @@ public record ExtractionInformation(
         @JsonProperty("is_protected")
         boolean isPasswordProtected,
         @JsonProperty("file_size")
-        String totalRarSize,
-        HeaderProperties header
+        String fileSize,
+        RARVersion version,
+        RarHeaderProperties header
 ) {}

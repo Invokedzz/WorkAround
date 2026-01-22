@@ -3,7 +3,7 @@ package org.api.workaround.service;
 import com.github.junrar.Archive;
 import com.github.junrar.Junrar;
 import com.github.junrar.exception.RarException;
-import com.github.junrar.rarfile.MainHeader;
+import com.github.junrar.rarfile.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FailedExtractionException;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 
 @Service
 public class FileService {
@@ -43,17 +44,12 @@ public class FileService {
             long reqBytes = cmf.length();
             if (isComputerStorageEnoughToExtractFile(directory, reqBytes)) {
                 if (cmf.isFile() && cmf.canRead()) {
-                    Junrar.extract(cmf, directory.toFile());
+                    Junrar.extract(cmf, directory.toFile(), null);
                     Files.copy(cmf.toPath(), filePath);
-
                     ExtractionInformation response;
                     try (var arch = new Archive(cmf)) {
                         String rarSize = convertBytesToMBFormat(reqBytes);
-                        response = new ExtractionInformation(
-                                file.getOriginalFilename(), arch.isEncrypted(),
-                                arch.isPasswordProtected(), rarSize,
-                                this.getHeaderProperties(arch.getMainHeader())
-                        );
+                        response = getExtractInfo(file, arch, rarSize);
                         arch.close();
                         return response;
                     }
@@ -71,7 +67,7 @@ public class FileService {
     }
 
     private File convertMultipartToTempFile(MultipartFile target) throws IOException {
-        File file = Files.createTempFile("upload-", ".arch types").toFile();
+        File file = Files.createTempFile("upload-", ".arch").toFile();
         target.transferTo(file);
         return file;
     }
@@ -85,19 +81,45 @@ public class FileService {
     private String convertBytesToMBFormat(long requiredBytes) {
         String str = String.valueOf(requiredBytes);
         StringBuilder builder = new StringBuilder();
-        final var mbLength = 9;
+
+        var mbLength = 9;
+        var appendLimit = 2;
 
         if (str.length() == mbLength) {
-            final var appendLimit = 2;
-            for (var i = 0; i <= appendLimit; i++) {
-                builder.append(str.charAt(i));
-            }
+            appendCharToStrBuilder(builder, str, appendLimit);
+        } else if (str.length() == mbLength - 1) {
+            appendLimit--;
+            appendCharToStrBuilder(builder, str, appendLimit);
+        } else if (str.length() == mbLength - 2) {
+            appendLimit -= 2;
+            appendCharToStrBuilder(builder, str, appendLimit);
         }
         // Example: It will return something like 102MB
         return builder + DigitalInformation.MB.name();
     }
 
-    private HeaderProperties getHeaderProperties(MainHeader header) {
-        return new HeaderProperties(header.getHeaderType(), header.isMultiVolume(), header.isEncrypted(), header.isProtected());
+    private void appendCharToStrBuilder(StringBuilder builder, String originalSize, int appendLimit) {
+        for (var i = 0; i <= appendLimit; i++) {
+            builder.append(originalSize.charAt(i));
+        }
+    }
+
+    private RARVersion getRarVersion(List<BaseBlock> headers) {
+        MarkHeader mark = new MarkHeader(headers.getFirst());
+        if (mark.isSignature()) {
+            return mark.getVersion();
+        }
+        return null;
+    }
+
+    private ExtractionInformation getExtractInfo(MultipartFile file, Archive arch, String rarSize) throws RarException {
+        return new ExtractionInformation(
+                file.getOriginalFilename(), arch.isEncrypted(), arch.isPasswordProtected(),
+                rarSize, this.getRarVersion(arch.getHeaders()), this.getHeaderProperties(arch.getMainHeader())
+        );
+    }
+
+    private RarHeaderProperties getHeaderProperties(MainHeader header) {
+        return new RarHeaderProperties(header.getHeaderType(), header.isMultiVolume(), header.isEncrypted(), header.isProtected());
     }
 }

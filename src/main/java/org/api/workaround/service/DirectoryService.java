@@ -14,22 +14,25 @@ public class DirectoryService {
 
     public Path getDirectory(String name, boolean shouldReplace) {
         try {
-            return createDirectory(name, shouldReplace);
+            return fileCreationFlow(name, shouldReplace);
         } catch (IOException e) {
             throw new UnableToCreateDirectoryException(e.getMessage());
         }
     }
 
-    private Path createDirectory(String name, boolean shouldReplace) throws IOException {
+    private Path fileCreationFlow(String name, boolean shouldReplace) throws IOException {
         final Path root = Paths.get(name);
         if (Files.exists(root) && shouldReplace) {
             FileUtils.deleteDirectory(root.toFile());
-            Files.createDirectories(root);
-            return root;
+            return createDirectoryThenGetPath(root);
         } else if (Files.notExists(root)) {
-            Files.createDirectories(root);
-            return root;
+            return createDirectoryThenGetPath(root);
         }
         throw new UnableToCreateDirectoryException("This directory already exists. Delete it or replace it.");
+    }
+
+    private Path createDirectoryThenGetPath(Path root) throws IOException {
+        Files.createDirectories(root);
+        return root;
     }
 }

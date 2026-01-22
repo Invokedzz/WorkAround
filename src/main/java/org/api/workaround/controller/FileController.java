@@ -18,7 +18,11 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            value = "/v1/rar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(@ModelAttribute FileRequest request) {
         var arch = fileService.extractRar(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(FileProperties.response(arch)));
