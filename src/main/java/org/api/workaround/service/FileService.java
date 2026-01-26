@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FileService {
@@ -27,14 +29,24 @@ public class FileService {
         this.directoryService = directoryService;
     }
 
-    public ExtractionInformation extractRar(FileRequest request) {
-        RarValidation.Validate(request.file());
+    public List<ExtractionInformation> extractRar(FileRequest request) {
+        var extractions = new ArrayList<ExtractionInformation>();
+        if (!isRarRequestValid(request.files())) {
+            return extractions;
+        }
+        for (var file : request.files()) {
+            RarValidation.Validate(file);
+            String fileName = file.getOriginalFilename();
+            assert fileName != null; // It got validated in RarValidation.class
+            Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
+            ExtractionInformation info = performExtraction(file, directory, filePath);
+            extractions.add(info);
+        }
+        return extractions;
+    }
 
-        String fileName = request.file().getOriginalFilename();
-        assert fileName != null; // It got validated in RarValidation.class
-        Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
-
-        return performExtraction(request.file(), directory, filePath);
+    private boolean isRarRequestValid(Set<MultipartFile> files) {
+        return !files.isEmpty() && files.size() <= 3;
     }
 
     private ExtractionInformation performExtraction(MultipartFile file, Path directory, Path filePath) {
@@ -48,7 +60,7 @@ public class FileService {
                     Files.copy(cmf.toPath(), filePath);
                     ExtractionInformation response;
                     try (var arch = new Archive(cmf)) {
-                        String rarSize = convertBytesToMBFormat(reqBytes);
+                        String rarSize = convertBytesToDeterminedFormat(reqBytes);
                         response = getExtractInfo(file, arch, rarSize);
                         arch.close();
                         return response;
@@ -78,42 +90,24 @@ public class FileService {
         return store.getUsableSpace() >= requiredBytes;
     }
 
-    private String convertBytesToMBFormat(long requiredBytes) {
-        String str = String.valueOf(requiredBytes);
-        StringBuilder builder = new StringBuilder();
-
-        var mbLength = 9;
-        var appendLimit = 2;
-
-        if (str.length() == mbLength) {
-            appendCharToStrBuilder(builder, str, appendLimit);
-        } else if (str.length() == mbLength - 1) {
-            appendLimit--;
-            appendCharToStrBuilder(builder, str, appendLimit);
-        } else if (str.length() == mbLength - 2) {
-            appendLimit -= 2;
-            appendCharToStrBuilder(builder, str, appendLimit);
-        } else {
-            return convertBytesToKB(builder, str, appendLimit);
+    private String convertBytesToDeterminedFormat(long requiredBytes) {
+        if (requiredBytes < 1024) {
+            return requiredBytes + DigitalInformation.BYTES.name();
         }
-        // Example: It will return something like 102MB
-        return builder + DigitalInformation.MB.name();
+
+        var kb = requiredBytes / 1024.0;
+
+        if (kb < 1024) {
+            return getStrFormat(kb, DigitalInformation.KB);
+        }
+
+        var mb = kb / 1024.0;
+        return getStrFormat(mb, DigitalInformation.MB);
     }
 
-    private String convertBytesToKB(StringBuilder builder, String originalSize, int appendLimit) {
-        if (originalSize.length() < 4) {
-            appendCharToStrBuilder(builder, originalSize, appendLimit);
-            return builder + DigitalInformation.KB.name();
-        }
-        appendLimit = 0;
-        builder.append(appendLimit);
-        return builder + DigitalInformation.KB.name();
-    }
-
-    private void appendCharToStrBuilder(StringBuilder builder, String originalSize, int appendLimit) {
-        for (var i = 0; i <= appendLimit; i++) {
-            builder.append(originalSize.charAt(i));
-        }
+    private String getStrFormat(double requiredBytes, DigitalInformation info) {
+        var format = "%.2f%s";
+        return String.format(format, requiredBytes, info);
     }
 
     private RARVersion getRarVersion(List<BaseBlock> headers) {

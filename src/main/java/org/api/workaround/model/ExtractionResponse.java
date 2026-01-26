@@ -11,7 +11,10 @@ public record ExtractionResponse<T>(String message, HttpStatus status, T propert
     final static ZonedDateTime TIMESTAMP = LocalDateTime.now().atZone(ZoneId.systemDefault());
 
     public static ExtractionResponse<FileProperties> response(FileProperties properties) {
-        final var message = getMessage("Success! File(s) extracted properly!");
+        var message = getMessage("Success! File(s) extracted properly!");
+        if (properties.extract().isEmpty()) {
+            message = "Not a single file was extracted!";
+        }
         final var status = getStatus(HttpStatus.ACCEPTED);
         return new ExtractionResponse<>(message, status, properties, TIMESTAMP);
     }
