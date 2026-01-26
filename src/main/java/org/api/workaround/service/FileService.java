@@ -93,9 +93,21 @@ public class FileService {
         } else if (str.length() == mbLength - 2) {
             appendLimit -= 2;
             appendCharToStrBuilder(builder, str, appendLimit);
+        } else {
+            return convertBytesToKB(builder, str, appendLimit);
         }
         // Example: It will return something like 102MB
         return builder + DigitalInformation.MB.name();
+    }
+
+    private String convertBytesToKB(StringBuilder builder, String originalSize, int appendLimit) {
+        if (originalSize.length() < 4) {
+            appendCharToStrBuilder(builder, originalSize, appendLimit);
+            return builder + DigitalInformation.KB.name();
+        }
+        appendLimit = 0;
+        builder.append(appendLimit);
+        return builder + DigitalInformation.KB.name();
     }
 
     private void appendCharToStrBuilder(StringBuilder builder, String originalSize, int appendLimit) {
