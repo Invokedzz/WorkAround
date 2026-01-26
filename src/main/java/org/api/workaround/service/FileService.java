@@ -29,6 +29,7 @@ public class FileService {
         this.directoryService = directoryService;
     }
 
+    // TODO: use map in order to extract .rar files that contain passwords
     public List<ExtractionInformation> extractRar(FileRequest request) {
         var extractions = new ArrayList<ExtractionInformation>();
         if (!isRarRequestValid(request.files())) {
@@ -58,10 +59,9 @@ public class FileService {
                 if (cmf.isFile() && cmf.canRead()) {
                     Junrar.extract(cmf, directory.toFile(), null);
                     Files.copy(cmf.toPath(), filePath);
-                    ExtractionInformation response;
                     try (var arch = new Archive(cmf)) {
                         String rarSize = convertBytesToDeterminedFormat(reqBytes);
-                        response = getExtractInfo(file, arch, rarSize);
+                        ExtractionInformation response = getExtractInfo(file, arch, rarSize);
                         arch.close();
                         return response;
                     }
@@ -102,7 +102,12 @@ public class FileService {
         }
 
         var mb = kb / 1024.0;
-        return getStrFormat(mb, DigitalInformation.MB);
+        if (mb < 1024) {
+            return getStrFormat(mb, DigitalInformation.MB);
+        }
+
+        var gb = mb / 1024.0;
+        return getStrFormat(gb, DigitalInformation.GB);
     }
 
     private String getStrFormat(double requiredBytes, DigitalInformation info) {

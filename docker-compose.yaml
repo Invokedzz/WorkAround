@@ -1,0 +1,11 @@
+services:
+  workaround:
+    build: .
+    image: workaround:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - workaround-data:/data
+volumes:
+  workaround-data:

@@ -29,7 +29,7 @@ public class DirectoryService {
     }
 
     private Path fileCreationFlow(String name, boolean shouldReplace) throws IOException {
-        final Path root = Paths.get(storageRoot + name);
+        final Path root = Paths.get(storageRoot + "/" + name);
         if (Files.exists(root) && shouldReplace) {
             FileUtils.deleteDirectory(root.toFile());
             return createDirectoryThenGetPath(root);

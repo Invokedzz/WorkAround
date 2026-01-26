@@ -46,15 +46,15 @@ public class RarValidation extends ValidationUtility {
 
     private static boolean isHeaderValid(MultipartFile file) {
         try {
-            byte [] bytes = file.getResource().getContentAsByteArray();
+            byte[] bytes = file.getResource().getContentAsByteArray();
             if (bytes.length >= 4 && bytes[0] == 0x52) {
                 if (isRarVersionV5(bytes)) {
                     return false;
                 }
-                if (bytes[1] == 0x45 && bytes[2] == 0x7e && bytes[3] == 0x5e) {
+                else if (isRarVersionOld(bytes)) {
                     return true;
                 }
-                else if (bytes[1] == 0x61 && bytes[2] == 0x72 && bytes[3] == 0x21 && bytes[4] == 0x1a && bytes[5] == 0x07 && bytes[6] == 0x00) {
+                else if (isRarVersionV4(bytes)) {
                     return true;
                 }
             }
@@ -64,7 +64,16 @@ public class RarValidation extends ValidationUtility {
         return false;
     }
 
-    private static boolean isRarVersionV5(byte... contentAsByte) {
-        return contentAsByte[6] == 0x01;
+    private static boolean isRarVersionV5(byte... bytes) {
+        return bytes[6] == 0x01;
+    }
+
+    private static boolean isRarVersionOld(byte... bytes) {
+        return bytes[1] == 0x45 && bytes[2] == 0x7e && bytes[3] == 0x5e;
+    }
+
+    private static boolean isRarVersionV4(byte... bytes) {
+        return  bytes[1] == 0x61 && bytes[2] == 0x72 && bytes[3] == 0x21 &&
+                bytes[4] == 0x1a && bytes[5] == 0x07 && bytes[6] == 0x00;
     }
 }
