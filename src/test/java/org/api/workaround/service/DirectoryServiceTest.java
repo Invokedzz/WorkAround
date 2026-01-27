@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
 @SpringBootTest
-@TestPropertySource(properties = "storage.root.rar=src/test/example")
+@TestPropertySource(properties = "storage.root.rar=src/test/resources")
 class DirectoryServiceTest {
 
     @Value("${storage.root.rar}")
@@ -25,7 +25,7 @@ class DirectoryServiceTest {
 
     @Test
     void storageRootValue() {
-        assertEquals("src/test/example", storageRoot);
+        assertEquals("src/test/resources", storageRoot);
     }
 
     @Test

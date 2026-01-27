@@ -92,7 +92,7 @@ public class FileService {
 
     private String convertBytesToDeterminedFormat(long requiredBytes) {
         if (requiredBytes < 1024) {
-            return requiredBytes + DigitalInformation.BYTES.name();
+            return requiredBytes + " " + DigitalInformation.BYTES.name();
         }
 
         var kb = requiredBytes / 1024.0;
