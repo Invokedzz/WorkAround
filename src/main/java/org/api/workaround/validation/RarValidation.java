@@ -12,13 +12,14 @@ import java.util.List;
 public class RarValidation extends ValidationUtility {
 
     private final static int FILE_SIZE_LIMIT = 300_000_000; // 300MB
-    private final static String [] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.getValue(), FileFormat.CBR.getValue()};
+    private final static String[] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.getValue(), FileFormat.CBR.getValue()};
 
-    public static void Validate(MultipartFile file) {
+    public static void validate(MultipartFile file) {
         var messages = new ArrayList<String>();
 
-        if (!isFileNotNull(file)) {
+        if (isFileNull(file)) {
             messages.add("Oops! File cannot be null!");
+            throw new FileValidationException(messages);
         }
 
         if (isFileEmpty(file)) {
@@ -37,10 +38,10 @@ public class RarValidation extends ValidationUtility {
             messages.add("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.");
         }
 
-        ThrowsIfMessageListIsNotEmpty(messages);
+        throwsIfMessageListIsNotEmpty(messages);
     }
 
-    private static void ThrowsIfMessageListIsNotEmpty(List<String> messages) {
+    private static void throwsIfMessageListIsNotEmpty(List<String> messages) {
         if (!messages.isEmpty()) throw new FileValidationException(messages);
     }
 

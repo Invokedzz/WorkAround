@@ -10,8 +10,8 @@ public class ValidationUtility {
         return file.isEmpty();
     }
 
-    public static boolean isFileNotNull(MultipartFile file) {
-        return file != null && file.getOriginalFilename() != null;
+    public static boolean isFileNull(MultipartFile file) {
+        return file == null;
     }
 
     public static boolean isFileFromACertainFormat(MultipartFile file, String... formats) {

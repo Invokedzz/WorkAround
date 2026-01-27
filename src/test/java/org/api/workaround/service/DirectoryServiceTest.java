@@ -21,7 +21,7 @@ class DirectoryServiceTest {
     @Autowired
     private DirectoryService directoryService;
 
-    private final static String FILE_NAME = "test_name";
+    private final static String FILE_NAME = "directory_test_result";
 
     @Test
     void storageRootValue() {
@@ -41,10 +41,12 @@ class DirectoryServiceTest {
 
     @Test
     void throwsException_If_DirectoryAlreadyExists() {
-        assertThrows(
+        var ex = assertThrows(
                 UnableToCreateDirectoryException.class,
                 () -> directoryService.getDirectory(FILE_NAME, false),
                 "This directory already exists. Delete it or replace it."
         );
+        assertEquals("This directory already exists. Delete it or replace it.", ex.getMessage());
+        assertEquals(UnableToCreateDirectoryException.class, ex.getClass());
     }
 }

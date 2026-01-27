@@ -36,7 +36,7 @@ public class FileService {
             return extractions;
         }
         for (var file : request.files()) {
-            RarValidation.Validate(file);
+            RarValidation.validate(file);
             String fileName = file.getOriginalFilename();
             assert fileName != null; // It got validated in RarValidation.class
             Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
