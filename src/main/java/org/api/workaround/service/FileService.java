@@ -21,6 +21,7 @@ import java.util.*;
 public class FileService {
 
     private final DirectoryService directoryService;
+    private final static int FILE_CONTAINER_SIZE_LIMIT = 3;
     private final static Logger log = LogManager.getLogger(FileService.class);
 
     public FileService(DirectoryService directoryService) {
@@ -32,41 +33,56 @@ public class FileService {
         var extractions = new ArrayList<ExtractionInformation>();
         for (var entry : request.files().entrySet()) {
             List<MultipartFile> files = entry.getValue();
-            String password = entry.getKey();
+            String[] passwords = handlePassword(entry.getKey());
             if (!isRarRequestValid(files)) {
                 return extractions;
             }
+
+            int index = 0;
+
             for (var file : files) {
                 RarValidation.validate(file);
                 String fileName = file.getOriginalFilename();
                 assert fileName != null;
                 Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
-                ExtractionInformation info = performExtraction(file, password, directory, filePath);
+                ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);
                 extractions.add(info);
+                if (index != passwords.length - 1) {
+                    index++;
+                }
             }
         }
         return extractions;
     }
 
     private boolean isRarRequestValid(Collection<MultipartFile> files) {
-        return !files.isEmpty() && files.size() <= 3;
+        return !files.isEmpty() && files.size() <= FILE_CONTAINER_SIZE_LIMIT;
     }
 
-    private ExtractionInformation performExtraction(MultipartFile file, String password, Path directory, Path filePath) {
+    private String[] handlePassword(String password) {
+        var emptyStr = "";
+        if (password == null || password.isEmpty()) {
+            return new String[]{emptyStr};
+        }
+
+        return password.trim().split(",");
+    }
+
+    private ExtractionInformation performExtraction(MultipartFile file, String[] passwords, Path directory, Path filePath, int index) {
         File cmf = null;
         try {
             cmf = convertMultipartToTempFile(file);
             long reqBytes = cmf.length();
             if (isComputerStorageEnoughToExtractFile(directory, reqBytes)) {
                 if (cmf.isFile() && cmf.canRead()) {
+                    ExtractionInformation response;
                     try (var arch = new Archive(cmf)) {
-                        Junrar.extract(cmf, directory.toFile(), password);
+                        Junrar.extract(cmf, directory.toFile(), passwords[index]);
                         Files.copy(cmf.toPath(), filePath);
                         String rarSize = convertBytesToDeterminedFormat(reqBytes);
-                        ExtractionInformation response = getExtractInfo(file, arch, rarSize);
-                        arch.close();
-                        return response;
+                        response = getExtractInfo(file, arch, rarSize);
                     }
+                    return response;
                 }
             }
         } catch (RarException | IOException e) {
