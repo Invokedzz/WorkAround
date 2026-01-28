@@ -15,9 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class FileService {
@@ -30,36 +28,40 @@ public class FileService {
     }
 
     // TODO: use map in order to extract .rar files that contain passwords
-    public List<ExtractionInformation> extractRar(FileRequest request) {
+    public Collection<ExtractionInformation> extractRar(FileRequest request) {
         var extractions = new ArrayList<ExtractionInformation>();
-        if (!isRarRequestValid(request.files())) {
-            return extractions;
-        }
-        for (var file : request.files()) {
-            RarValidation.validate(file);
-            String fileName = file.getOriginalFilename();
-            assert fileName != null; // It got validated in RarValidation.class
-            Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
-            ExtractionInformation info = performExtraction(file, directory, filePath);
-            extractions.add(info);
+        for (var entry : request.files().entrySet()) {
+            List<MultipartFile> files = entry.getValue();
+            String password = entry.getKey();
+            if (!isRarRequestValid(files)) {
+                return extractions;
+            }
+            for (var file : files) {
+                RarValidation.validate(file);
+                String fileName = file.getOriginalFilename();
+                assert fileName != null;
+                Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
+                ExtractionInformation info = performExtraction(file, password, directory, filePath);
+                extractions.add(info);
+            }
         }
         return extractions;
     }
 
-    private boolean isRarRequestValid(Set<MultipartFile> files) {
+    private boolean isRarRequestValid(Collection<MultipartFile> files) {
         return !files.isEmpty() && files.size() <= 3;
     }
 
-    private ExtractionInformation performExtraction(MultipartFile file, Path directory, Path filePath) {
+    private ExtractionInformation performExtraction(MultipartFile file, String password, Path directory, Path filePath) {
         File cmf = null;
         try {
             cmf = convertMultipartToTempFile(file);
             long reqBytes = cmf.length();
             if (isComputerStorageEnoughToExtractFile(directory, reqBytes)) {
                 if (cmf.isFile() && cmf.canRead()) {
-                    Junrar.extract(cmf, directory.toFile(), null);
-                    Files.copy(cmf.toPath(), filePath);
                     try (var arch = new Archive(cmf)) {
+                        Junrar.extract(cmf, directory.toFile(), password);
+                        Files.copy(cmf.toPath(), filePath);
                         String rarSize = convertBytesToDeterminedFormat(reqBytes);
                         ExtractionInformation response = getExtractInfo(file, arch, rarSize);
                         arch.close();

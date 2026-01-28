@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class FileController {
@@ -23,7 +24,9 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(@ModelAttribute FileRequest request) {
+    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(MultipartHttpServletRequest http) {
+        var fileMap = http.getMultiFileMap();
+        FileRequest request = new FileRequest(fileMap);
         var arch = fileService.extractRar(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(FileProperties.response(arch)));
     }

@@ -1,7 +1,6 @@
 package org.api.workaround.service;
 
 import org.api.workaround.model.DigitalInformation;
-import org.api.workaround.model.ExtractionInformation;
 import org.api.workaround.model.FileRequest;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.Tag;
@@ -12,9 +11,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +30,7 @@ public class FileServiceTest {
     void shouldExtractThenGetResult() throws IOException {
         final var file = new File(PATH + "/" + "rar4.rar");
         var mpFile = FileConverter.convertFileToMultipartFile(file);
-        List<ExtractionInformation> infos = fileService.extractRar(new FileRequest(Set.of(mpFile)));
+        var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile)))).stream().toList();
         var getInfo = infos.getFirst();
 
         assertNotNull(getInfo.header());
