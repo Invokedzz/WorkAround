@@ -46,7 +46,9 @@ public class FileService {
                 assert fileName != null;
                 Path directory = directoryService.getDirectory(fileName, shouldReplace), filePath = directory.resolve(fileName);
                 ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);
-                extractions.add(info);
+                if (info != null) {
+                    extractions.add(info);
+                }
                 if (index != passwords.length - 1) {
                     index++;
                 }
@@ -110,6 +112,10 @@ public class FileService {
         if (directory != null) {
             try {
                 FileUtils.deleteDirectory(directory.toFile());
+                var parent = directory.getParent().toFile();
+                if (Objects.requireNonNull(parent.listFiles()).length == 0) {
+                    FileUtils.deleteDirectory(parent);
+                }
             } catch (IOException e) {
                 throw new FailedExtractionException(e.getMessage());
             }

@@ -1,5 +1,6 @@
 package org.api.workaround.exception.handler;
 
+import com.github.junrar.exception.CrcErrorException;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.api.workaround.exception.*;
 import org.api.workaround.model.ExceptionResponse;
@@ -20,9 +21,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({UnableToCreateDirectoryException.class, InvalidFileException.class})
+    // Junrar, when the password is wrong for .RAR extraction, throws an exception in a weird way
+    // So I needed to create this aberration in order to deal with it
+    @ExceptionHandler({
+            UnableToCreateDirectoryException.class, InvalidFileException.class,
+            FailedExtractionException.class, CrcErrorException.class
+    })
     public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
-        var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.BAD_REQUEST);
+        ExceptionResponse resp = null;
+        if (e.getMessage() != null) {
+            resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+        else {
+            if (e.getClass().equals(FailedExtractionException.class)) {
+                final var msg = "Please, enter a valid password in order to extract the file!";
+                resp = ExceptionResponse.response(List.of(msg), HttpStatus.BAD_REQUEST);
+            }
+        }
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
@@ -41,11 +56,5 @@ public class GlobalExceptionHandler {
         var msg = e.getName() + " field should be of type " + entityClass;
         var resp = ExceptionResponse.response(List.of(msg), HttpStatus.UNPROCESSABLE_CONTENT);
         return new ResponseEntity<>(resp, HttpStatus.UNPROCESSABLE_CONTENT);
-    }
-
-    @ExceptionHandler(FailedExtractionException.class)
-    public ResponseEntity<ExceptionResponse> handleInternalServerException(Exception e) {
-        var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
