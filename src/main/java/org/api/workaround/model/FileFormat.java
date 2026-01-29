@@ -2,7 +2,8 @@ package org.api.workaround.model;
 
 public enum FileFormat {
     RAR(".rar"),
-    CBR(".cbr");
+    CBR(".cbr"),
+    PDF(".pdf"); // This shall be implemented soon
 
     private final String value;
 

@@ -4,6 +4,7 @@ import com.github.junrar.Archive;
 import com.github.junrar.Junrar;
 import com.github.junrar.exception.RarException;
 import com.github.junrar.rarfile.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FailedExtractionException;
@@ -28,8 +29,7 @@ public class FileService {
         this.directoryService = directoryService;
     }
 
-    // TODO: use map in order to extract .rar files that contain passwords
-    public Collection<ExtractionInformation> extractRar(FileRequest request) {
+    public Collection<ExtractionInformation> extractRar(FileRequest request, Boolean shouldReplace) {
         var extractions = new ArrayList<ExtractionInformation>();
         for (var entry : request.files().entrySet()) {
             List<MultipartFile> files = entry.getValue();
@@ -44,7 +44,7 @@ public class FileService {
                 RarValidation.validate(file);
                 String fileName = file.getOriginalFilename();
                 assert fileName != null;
-                Path directory = directoryService.getDirectory(fileName, true), filePath = directory.resolve(fileName);
+                Path directory = directoryService.getDirectory(fileName, shouldReplace), filePath = directory.resolve(fileName);
                 ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);
                 extractions.add(info);
                 if (index != passwords.length - 1) {
@@ -86,12 +86,10 @@ public class FileService {
                 }
             }
         } catch (RarException | IOException e) {
+            inCaseOfErrorRollbackDirectoryCreation(directory);
             throw new FailedExtractionException(e.getMessage());
         } finally {
-            if (cmf != null && cmf.exists()) {
-                boolean isDeleted = cmf.delete();
-                log.info("Temp file deleted after extraction: {}", isDeleted);
-            }
+            deleteTempFileAfterExtraction(cmf);
         }
         return null;
     }
@@ -106,6 +104,23 @@ public class FileService {
         FileStore store = Files.getFileStore(extractionDir);
         log.info("REQUIRED BYTES: {}, USABLE SPACE: {}", requiredBytes, store.getUsableSpace());
         return store.getUsableSpace() >= requiredBytes;
+    }
+
+    private void inCaseOfErrorRollbackDirectoryCreation(Path directory) {
+        if (directory != null) {
+            try {
+                FileUtils.deleteDirectory(directory.toFile());
+            } catch (IOException e) {
+                throw new FailedExtractionException(e.getMessage());
+            }
+        }
+    }
+
+    private void deleteTempFileAfterExtraction(File temp) {
+        if (temp != null && temp.exists()) {
+            boolean isDeleted = temp.delete();
+            log.info("Temp file deleted after extraction: {}", isDeleted);
+        }
     }
 
     private String convertBytesToDeterminedFormat(long requiredBytes) {

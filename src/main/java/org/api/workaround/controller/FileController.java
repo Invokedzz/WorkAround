@@ -24,10 +24,12 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(MultipartHttpServletRequest http) {
-        var fileMap = http.getMultiFileMap();
-        FileRequest request = new FileRequest(fileMap);
-        var arch = fileService.extractRar(request);
+    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(
+            MultipartHttpServletRequest http,
+            @RequestParam(required = false, defaultValue = "true") Boolean shouldReplace
+    )
+    {
+        var arch = fileService.extractRar(FileRequest.response(http.getMultiFileMap()), shouldReplace);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(FileProperties.response(arch)));
     }
 }

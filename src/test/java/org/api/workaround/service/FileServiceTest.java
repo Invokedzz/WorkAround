@@ -30,7 +30,7 @@ public class FileServiceTest {
     void shouldExtractThenGetResult() throws IOException {
         final var file = new File(PATH + "/" + "rar4.rar");
         var mpFile = FileConverter.convertFileToMultipartFile(file);
-        var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile)))).stream().toList();
+        var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile))), true).stream().toList();
         var getInfo = infos.getFirst();
 
         assertNotNull(getInfo.header());

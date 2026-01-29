@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -29,6 +30,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handlePayloadTooLargeException(FileUploadException e) {
         var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.CONTENT_TOO_LARGE);
         return new ResponseEntity<>(resp, HttpStatus.CONTENT_TOO_LARGE);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionResponse> handlePayloadTooLargeException(MethodArgumentTypeMismatchException e) {
+        var entityClass = "";
+        if (e.getRequiredType() != null) {
+            entityClass = e.getRequiredType().getName();
+        }
+        var msg = e.getName() + " field should be of type " + entityClass;
+        var resp = ExceptionResponse.response(List.of(msg), HttpStatus.UNPROCESSABLE_CONTENT);
+        return new ResponseEntity<>(resp, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
     @ExceptionHandler(FailedExtractionException.class)
