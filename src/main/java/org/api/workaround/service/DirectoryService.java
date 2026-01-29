@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.UnableToCreateDirectoryException;
+import org.api.workaround.model.Punctuation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,16 @@ public class DirectoryService {
     private String storageRoot;
     private final static Logger log = LogManager.getLogger(DirectoryService.class);
 
+    /**
+     * Creates or replaces an existing directory, then return it
+     * @param name the chosen name for the directory, typically named by its .RAR file
+     * @param shouldReplace indicates whether files should be replaced or not
+     * @return the created directory
+     * @throws UnableToCreateDirectoryException
+     * if "shouldReplace" is false, the exception is thrown if the directory already exists
+     *
+     * @see FileService
+     */
     public Path getDirectory(String name, boolean shouldReplace) {
         try {
             log.info("Directory name: {}", name);
@@ -29,7 +40,7 @@ public class DirectoryService {
     }
 
     private Path fileCreationFlow(String name, boolean shouldReplace) throws IOException {
-        final Path root = Paths.get(storageRoot + "/" + name);
+        final Path root = Paths.get(storageRoot + Punctuation.SLASH + name);
         if (Files.exists(root) && shouldReplace) {
             FileUtils.deleteDirectory(root.toFile());
             return createDirectoryThenGetPath(root);

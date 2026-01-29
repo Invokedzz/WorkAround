@@ -9,11 +9,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RarValidation extends ValidationUtility {
+public abstract class RarValidation extends ValidationUtility {
 
     private final static int FILE_SIZE_LIMIT = 300_000_000; // 300MB
-    private final static String[] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.getValue(), FileFormat.CBR.getValue()};
+    private final static String[] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.toString(), FileFormat.CBR.toString()};
 
+    /**
+     * This method is responsible to perform generic validations and validations related to .RAR/.CBR files
+     * @param file the .RAR/.CBR file sent by the user
+     * @throws FileValidationException if any of the statements are correct
+     */
     public static void validate(MultipartFile file) {
         var messages = new ArrayList<String>();
 

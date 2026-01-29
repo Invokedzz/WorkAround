@@ -1,0 +1,27 @@
+package org.api.workaround.model;
+
+/**
+ * Punctuations to work with directories and files. Or just to remove the need of hardcoded strings.
+ */
+public enum Punctuation {
+    /**
+     * Slash (/)
+     */
+    SLASH("/"),
+
+    /**
+     * Apostrophe (,)
+     */
+    APOSTROPHE(",");
+
+    private final String value;
+
+    Punctuation(final String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+}

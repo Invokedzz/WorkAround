@@ -1,8 +1,22 @@
 package org.api.workaround.model;
 
+/**
+ * Available file formats.
+ */
 public enum FileFormat {
+    /**
+     * RAR format (.rar)
+     */
     RAR(".rar"),
+
+    /**
+     * CBR format (.cbr)
+     */
     CBR(".cbr"),
+
+    /**
+     * PDF format (.pdf)
+     */
     PDF(".pdf"); // This shall be implemented soon
 
     private final String value;
@@ -11,7 +25,8 @@ public enum FileFormat {
         this.value = value;
     }
 
-    public String getValue() {
+    @Override
+    public String toString() {
         return value;
     }
 }

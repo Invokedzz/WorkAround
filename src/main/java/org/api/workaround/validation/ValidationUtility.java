@@ -4,17 +4,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
-public class ValidationUtility {
+public abstract class ValidationUtility {
 
     protected static boolean isFileEmpty(MultipartFile file) {
         return file.isEmpty();
     }
 
-    public static boolean isFileNull(MultipartFile file) {
+    protected static boolean isFileNull(MultipartFile file) {
         return file == null;
     }
 
-    public static boolean isFileFromACertainFormat(MultipartFile file, String... formats) {
+    protected static boolean isFileFromACertainFormat(MultipartFile file, String... formats) {
         for (var format : formats) {
             if (Objects.requireNonNull(file.getOriginalFilename()).endsWith(format)) {
                 return true;

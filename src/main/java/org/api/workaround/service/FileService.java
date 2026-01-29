@@ -29,6 +29,13 @@ public class FileService {
         this.directoryService = directoryService;
     }
 
+    /**
+     * Extracts .RAR and .CBR files, returning the result as JSON and saving the files in a folder
+     * @param request request made by user, containing passwords and files
+     * @param shouldReplace indicates whether files should be replaced or not
+     * @return a collection of files that were successfully extracted
+     * @throws FailedExtractionException if something goes wrong in the operation
+     */
     public Collection<ExtractionInformation> extractRar(FileRequest request, Boolean shouldReplace) {
         var extractions = new ArrayList<ExtractionInformation>();
         for (var entry : request.files().entrySet()) {
@@ -67,7 +74,7 @@ public class FileService {
             return new String[]{emptyStr};
         }
 
-        return password.trim().split(",");
+        return password.trim().split(Punctuation.APOSTROPHE.toString());
     }
 
     private ExtractionInformation performExtraction(MultipartFile file, String[] passwords, Path directory, Path filePath, int index) {
@@ -131,25 +138,25 @@ public class FileService {
 
     private String convertBytesToDeterminedFormat(long requiredBytes) {
         if (requiredBytes < 1024) {
-            return requiredBytes + " " + DigitalInformation.BYTES.name();
+            return requiredBytes + " " + DigitalInformation.BYTES;
         }
 
         var kb = requiredBytes / 1024.0;
 
         if (kb < 1024) {
-            return getStrFormat(kb, DigitalInformation.KB);
+            return getStrFormat(kb, DigitalInformation.KB.toString());
         }
 
         var mb = kb / 1024.0;
         if (mb < 1024) {
-            return getStrFormat(mb, DigitalInformation.MB);
+            return getStrFormat(mb, DigitalInformation.MB.toString());
         }
 
         var gb = mb / 1024.0;
-        return getStrFormat(gb, DigitalInformation.GB);
+        return getStrFormat(gb, DigitalInformation.GB.toString());
     }
 
-    private String getStrFormat(double requiredBytes, DigitalInformation info) {
+    private String getStrFormat(double requiredBytes, String info) {
         var format = "%.2f%s";
         return String.format(format, requiredBytes, info);
     }

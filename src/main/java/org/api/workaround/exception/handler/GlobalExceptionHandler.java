@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileValidationException.class)
     public ResponseEntity<ExceptionResponse> handleValidationException(FileValidationException e) {
-        var resp = ExceptionResponse.response(e.getErrors(), HttpStatus.BAD_REQUEST);
+        final var resp = ExceptionResponse.response(e.getErrors(), HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileUploadException.class)
     public ResponseEntity<ExceptionResponse> handlePayloadTooLargeException(FileUploadException e) {
-        var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.CONTENT_TOO_LARGE);
+        final var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.CONTENT_TOO_LARGE);
         return new ResponseEntity<>(resp, HttpStatus.CONTENT_TOO_LARGE);
     }
 
@@ -53,8 +53,8 @@ public class GlobalExceptionHandler {
         if (e.getRequiredType() != null) {
             entityClass = e.getRequiredType().getName();
         }
-        var msg = e.getName() + " field should be of type " + entityClass;
-        var resp = ExceptionResponse.response(List.of(msg), HttpStatus.UNPROCESSABLE_CONTENT);
+        final var msg = e.getName() + " field should be of type " + entityClass;
+        final var resp = ExceptionResponse.response(List.of(msg), HttpStatus.UNPROCESSABLE_CONTENT);
         return new ResponseEntity<>(resp, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 }
