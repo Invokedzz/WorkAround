@@ -18,7 +18,7 @@ This API was created to extract and read different types of files, such as .RAR/
 
 ## Features
 
-- **.RAR/.CBR extraction**: it extracts these files and storages them in a `/data` folder in the root of the project;
+- **.RAR/.CBR extraction**: it extracts these files and storages them in `/data` folder located in the root of the project;
 
 ## Contributing
 
@@ -30,4 +30,4 @@ This API was created to extract and read different types of files, such as .RAR/
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT License - see the [license.md](https://github.com/Invokedzz/WorkAround/blob/master/LICENSE.md) file for details.
