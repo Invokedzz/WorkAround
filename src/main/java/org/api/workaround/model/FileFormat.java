@@ -25,6 +25,9 @@ public enum FileFormat {
         this.value = value;
     }
 
+    /**
+     * @return the enum name as a string
+     */
     @Override
     public String toString() {
         return value;

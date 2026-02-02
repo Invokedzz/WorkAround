@@ -10,6 +10,10 @@ public record ExtractionResponse<T>(String message, HttpStatus status, T propert
 
     final static ZonedDateTime TIMESTAMP = LocalDateTime.now().atZone(ZoneId.systemDefault());
 
+    /**
+     * @param properties of each file extracted
+     * @return the response to send as JSON
+     */
     public static ExtractionResponse<FileProperties> response(FileProperties properties) {
         var message = getMessage("Success! File(s) extracted properly!");
         if (properties.extract().isEmpty()) {

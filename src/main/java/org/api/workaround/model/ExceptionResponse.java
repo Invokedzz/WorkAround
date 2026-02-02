@@ -16,6 +16,11 @@ public record ExceptionResponse(
         ZonedDateTime timestamp
 )
 {
+    /**
+     * @param messages group of error messages
+     * @param httpStatus status of the request
+     * @return the response
+     */
     public static ExceptionResponse response (List<String> messages, HttpStatus httpStatus) {
         return new ExceptionResponse(messages, httpStatus, LocalDateTime.now().atZone(ZoneId.systemDefault()));
     }
