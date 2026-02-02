@@ -2,6 +2,7 @@ package org.api.workaround.service;
 
 import org.api.workaround.model.DigitalInformation;
 import org.api.workaround.model.FileRequest;
+import org.api.workaround.model.Punctuation;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class FileServiceTest {
 
     @Test
     void shouldExtractThenGetResult() throws IOException {
-        final var file = new File(PATH + "/" + "rar4.rar");
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
         var mpFile = FileConverter.convertFileToMultipartFile(file);
         var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile))), true).stream().toList();
         var getInfo = infos.getFirst();

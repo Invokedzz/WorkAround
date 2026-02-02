@@ -69,7 +69,7 @@ public class FileService {
     }
 
     private String[] handlePassword(String password) {
-        var emptyStr = "";
+        final var emptyStr = "";
         if (password == null || password.isEmpty()) {
             return new String[]{emptyStr};
         }
@@ -157,7 +157,7 @@ public class FileService {
     }
 
     private String getStrFormat(double requiredBytes, String info) {
-        var format = "%.2f%s";
+        final var format = "%.2f%s";
         return String.format(format, requiredBytes, info);
     }
 

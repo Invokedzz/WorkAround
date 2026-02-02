@@ -35,7 +35,7 @@ public class FileControllerTest {
 
     @BeforeEach
     void setupBeforeTests() throws Exception {
-        final var file = new File(PATH + "/" + "rar4.rar");
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
         mpFile = FileConverter.convertFileToMultipartFile(file);
         var headerProp = new RarHeaderProperties(null, false, false, false);
         extInfo = new ExtractionInformation("rar4", false, false, null, null, headerProp);
@@ -55,10 +55,10 @@ public class FileControllerTest {
                 .andExpect(jsonPath("properties.extract_info[0].is_encrypted").value(info.isEncrypted()))
                 .andExpect(jsonPath("properties.extract_info[0].is_protected").value(info.isPasswordProtected()))
                 .andExpect(jsonPath("properties.extract_info[0].version").value(info.version()))
-                .andExpect(jsonPath("properties.extract_info[0].version.header_info.header_type").value(info.header().headerType()))
-                .andExpect(jsonPath("properties.extract_info[0].version.header_info.is_multi_volume").value(info.header().isMultiVolume()))
-                .andExpect(jsonPath("properties.extract_info[0].version.header_info.is_encrypted").value(info.header().isEncrypted()))
-                .andExpect(jsonPath("properties.extract_info[0].version.header_info.is_protected").value(info.header().isProtected()))
+                .andExpect(jsonPath("properties.extract_info[0].header_info.header_type").value(info.header().headerType()))
+                .andExpect(jsonPath("properties.extract_info[0].header_info.is_multi_volume").value(info.header().isMultiVolume()))
+                .andExpect(jsonPath("properties.extract_info[0].header_info.is_encrypted").value(info.header().isEncrypted()))
+                .andExpect(jsonPath("properties.extract_info[0].header_info.is_protected").value(info.header().isProtected()))
                 .andExpect(status().isAccepted());
         verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));
     }

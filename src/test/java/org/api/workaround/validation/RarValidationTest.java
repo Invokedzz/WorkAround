@@ -3,6 +3,7 @@ package org.api.workaround.validation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FileValidationException;
+import org.api.workaround.model.Punctuation;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class RarValidationTest {
 
     @Test
     void shouldThrowIfFileIsInvalidAndEmpty() throws IOException {
-        final var file = new File(PATH + "/" + "empty-file.txt");
+        final var file = new File(PATH + Punctuation.SLASH + "empty-file.txt");
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(FileValidationException.class, () -> RarValidation.validate(mtFile));
         assertEquals(3, ex.getErrors().size());
@@ -31,7 +32,7 @@ public class RarValidationTest {
 
     @Test
     void shouldThrowIfRarVersionIsV5() throws IOException {
-        final var file = new File(PATH + "/" + "test_1mb_v5.rar");
+        final var file = new File(PATH + Punctuation.SLASH + "test_1mb_v5.rar");
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(FileValidationException.class, () -> RarValidation.validate(mtFile));
         assertEquals(1, ex.getErrors().size());
@@ -51,7 +52,7 @@ public class RarValidationTest {
 
     @Test
     void shouldNotThrowIfFileIsValid() throws IOException {
-        final var file = new File(PATH + "/" + "rar4.rar");
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
         log.info("File: {}", file.getName());
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         assertDoesNotThrow(() -> RarValidation.validate(mtFile));
