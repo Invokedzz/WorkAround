@@ -18,7 +18,15 @@ This API was created to extract and read different types of files, such as .RAR/
 
 ## Features
 
-- **.RAR/.CBR extraction**: it extracts these files and storages them in `/data` folder located in the root of the project;
+- **.RAR/.CBR extraction**: it extracts these files and storages them in `/data` folder located in the root of the project
+
+## Getting Started
+
+So, let's get started. Well, before everything, make sure you're located in the root of the project. 
+Then, through the following command, start the application:
+```
+mvn spring-boot:run 
+```
 
 ## Contributing
 
