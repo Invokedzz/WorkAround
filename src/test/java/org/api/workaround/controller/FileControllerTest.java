@@ -1,5 +1,6 @@
 package org.api.workaround.controller;
 
+import org.api.workaround.exception.FailedExtractionException;
 import org.api.workaround.model.*;
 import org.api.workaround.service.FileService;
 import org.api.workaround.util.FileConverter;
@@ -46,8 +47,7 @@ public class FileControllerTest {
         var infos = List.of(extInfo);
         when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(infos);
         var info = infos.getFirst();
-        test.perform(multipart("/v1/rar").file("test", mpFile.getBytes())
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+        test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(jsonPath("message").value("Success! File(s) extracted properly!"))
                 .andExpect(jsonPath("status").value("202 ACCEPTED"))
                 .andExpect(jsonPath("properties.extract_info[0].file_name").value(info.fileName()))
@@ -60,6 +60,17 @@ public class FileControllerTest {
                 .andExpect(jsonPath("properties.extract_info[0].header_info.is_encrypted").value(info.header().isEncrypted()))
                 .andExpect(jsonPath("properties.extract_info[0].header_info.is_protected").value(info.header().isProtected()))
                 .andExpect(status().isAccepted());
+        verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));
+    }
+
+    @Test
+    void shouldReturnBadRequestIfOperationFails() throws Exception {
+        when(fileService.extractRar(any(FileRequest.class), eq(true))).thenThrow(new FailedExtractionException("mock"));
+        test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()))
+                .andExpect(jsonPath("error_messages[0]").value("mock"))
+                .andExpect(jsonPath("status").value("400 BAD_REQUEST"))
+                .andExpect(jsonPath("timestamp").isNotEmpty())
+                .andExpect(status().isBadRequest());
         verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));
     }
 }
