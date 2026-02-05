@@ -15,19 +15,11 @@ public record ExtractionResponse<T>(String message, HttpStatus status, T propert
      * @return the response to send as JSON
      */
     public static ExtractionResponse<FileProperties> response(FileProperties properties) {
-        var message = getMessage("Success! File(s) extracted properly!");
+        var message = "Success! File(s) extracted properly!";
         if (properties.extract().isEmpty()) {
             message = "Not a single file was extracted!";
         }
-        final var status = getStatus(HttpStatus.ACCEPTED);
+        final var status = HttpStatus.ACCEPTED;
         return new ExtractionResponse<>(message, status, properties, TIMESTAMP);
-    }
-
-    private static String getMessage(String message) {
-        return message;
-    }
-
-    private static HttpStatus getStatus(HttpStatus status) {
-        return status;
     }
 }
