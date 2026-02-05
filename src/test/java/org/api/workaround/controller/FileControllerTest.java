@@ -1,5 +1,6 @@
 package org.api.workaround.controller;
 
+import org.api.workaround.WorkAroundApplication;
 import org.api.workaround.exception.FailedExtractionException;
 import org.api.workaround.model.*;
 import org.api.workaround.service.FileService;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = FileController.class)
+@ContextConfiguration(classes = WorkAroundApplication.class)
 public class FileControllerTest {
 
     @Autowired

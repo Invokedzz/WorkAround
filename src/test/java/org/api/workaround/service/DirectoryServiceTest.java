@@ -1,17 +1,20 @@
 package org.api.workaround.service;
 
 import org.api.workaround.exception.UnableToCreateDirectoryException;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.api.workaround.model.Punctuation;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
-@SpringBootTest
+@SpringBootTest(classes = DirectoryService.class)
 @TestPropertySource(properties = "storage.root.rar=src/test/resources")
 class DirectoryServiceTest {
 
@@ -22,14 +25,25 @@ class DirectoryServiceTest {
     private DirectoryService directoryService;
 
     private final static String FILE_NAME = "directory_test_result";
+    private final static String STORAGE_PATH = "src/test/resources";
 
-    @Test
-    void storageRootValue() {
-        assertEquals("src/test/resources", storageRoot);
+    @BeforeAll
+    static void createDirectory() throws Exception {
+        Files.createDirectory(Path.of(STORAGE_PATH + Punctuation.SLASH + FILE_NAME));
+    }
+
+    @AfterAll
+    static void tearDownDirectory() throws Exception {
+        Files.deleteIfExists(Path.of(STORAGE_PATH + Punctuation.SLASH + FILE_NAME));
     }
 
     @Test
-    void createDirectory_Then_GetPath() {
+    void storageRootValue() {
+        assertEquals(STORAGE_PATH, storageRoot);
+    }
+
+    @Test
+    void replaceExisting_Directory_Then_GetPath() {
         final var name = FILE_NAME;
         var path = directoryService.getDirectory(name, true);
 
