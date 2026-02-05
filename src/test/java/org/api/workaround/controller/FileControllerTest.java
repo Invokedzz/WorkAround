@@ -3,6 +3,7 @@ package org.api.workaround.controller;
 import org.api.workaround.WorkAroundApplication;
 import org.api.workaround.exception.FailedExtractionException;
 import org.api.workaround.model.*;
+import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.service.FileService;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,7 @@ public class FileControllerTest {
     @Test
     void shouldPerformPostRequestThenGetRarFileInfo() throws Exception {
         var infos = List.of(extInfo);
-        when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(infos);
+        when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(FileProperties.response(infos, List.of()));
         var info = infos.getFirst();
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(jsonPath("message").value("Success! File(s) extracted properly!"))

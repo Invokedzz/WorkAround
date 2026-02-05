@@ -1,4 +1,4 @@
-package org.api.workaround.model;
+package org.api.workaround.model.enums;
 
 /**
  * Units of digital information.

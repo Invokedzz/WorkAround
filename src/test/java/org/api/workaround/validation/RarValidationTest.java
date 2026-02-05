@@ -3,7 +3,7 @@ package org.api.workaround.validation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FileValidationException;
-import org.api.workaround.model.Punctuation;
+import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

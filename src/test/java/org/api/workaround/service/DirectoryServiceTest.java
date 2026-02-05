@@ -1,7 +1,7 @@
 package org.api.workaround.service;
 
 import org.api.workaround.exception.UnableToCreateDirectoryException;
-import org.api.workaround.model.Punctuation;
+import org.api.workaround.model.enums.Punctuation;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

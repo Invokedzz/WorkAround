@@ -1,5 +1,8 @@
 package org.api.workaround.model;
 
+import org.api.workaround.model.enums.DigitalInformation;
+import org.api.workaround.model.enums.FileFormat;
+import org.api.workaround.model.enums.Punctuation;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

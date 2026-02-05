@@ -4,9 +4,9 @@ import com.github.junrar.rarfile.RARVersion;
 import com.github.junrar.rarfile.UnrarHeadertype;
 import org.apache.commons.io.FileUtils;
 import org.api.workaround.exception.FailedExtractionException;
-import org.api.workaround.model.DigitalInformation;
+import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.model.FileRequest;
-import org.api.workaround.model.Punctuation;
+import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,7 @@ public class FileServiceTest {
         final var target = Path.of(PATH);
         Files.createDirectories(target);
         var files = Path.of(FILES_PATH).toFile().listFiles();
+        assertNotNull(files);
         for (var file : files) {
             FileUtils.copyFileToDirectory(file, target.toFile());
         }
@@ -53,7 +54,7 @@ public class FileServiceTest {
     void shouldExtractThenGetResult() throws IOException {
         final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
         var mpFile = FileConverter.convertFileToMultipartFile(file);
-        var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile))), true).stream().toList();
+        var infos = fileService.extractRar(new FileRequest(Map.of("", List.of(mpFile))), true).extract().stream().toList();
         var getInfo = infos.getFirst();
 
         assertNotNull(getInfo.header());
@@ -72,7 +73,7 @@ public class FileServiceTest {
     void shouldExtractIfPasswordIsCorrect() throws Exception {
         final var file = new File(PATH + Punctuation.SLASH + "rar4-password.rar");
         var mpFile = FileConverter.convertFileToMultipartFile(file);
-        var infos = fileService.extractRar(new FileRequest(Map.of("junrar", List.of(mpFile))), true).stream().toList();
+        var infos = fileService.extractRar(new FileRequest(Map.of("junrar", List.of(mpFile))), true).extract().stream().toList();
         var getInfo = infos.getFirst();
 
         assertNotNull(getInfo.header());

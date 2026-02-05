@@ -1,4 +1,4 @@
-package org.api.workaround.model;
+package org.api.workaround.model.enums;
 
 /**
  * Punctuations to work with directories and files. Or just to remove the need of hardcoded strings.

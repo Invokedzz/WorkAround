@@ -3,7 +3,6 @@ package org.api.workaround.exception.handler;
 import com.github.junrar.exception.CrcErrorException;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.api.workaround.exception.*;
-import org.api.workaround.model.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -30,6 +30,6 @@ public class FileController {
     )
     {
         var arch = fileService.extractRar(FileRequest.response(http.getMultiFileMap()), shouldReplace);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(FileProperties.response(arch)));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(arch));
     }
 }

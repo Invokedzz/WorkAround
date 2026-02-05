@@ -1,4 +1,4 @@
-package org.api.workaround.model;
+package org.api.workaround.exception.handler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;

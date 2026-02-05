@@ -2,7 +2,7 @@ package org.api.workaround.validation;
 
 import org.api.workaround.exception.FileValidationException;
 import org.api.workaround.exception.InvalidFileException;
-import org.api.workaround.model.FileFormat;
+import org.api.workaround.model.enums.FileFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

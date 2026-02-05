@@ -2,6 +2,8 @@ package org.api.workaround.model;
 
 import com.github.junrar.rarfile.RARVersion;
 import com.github.junrar.rarfile.UnrarHeadertype;
+import org.api.workaround.exception.handler.ExceptionResponse;
+import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -49,7 +51,7 @@ public class ObjectResponseTest {
     class FilePropertiesResponseTest {
         @Test
         void expectsProperResponse() {
-            var response = FileProperties.response(List.of(extInfo)).extract().stream().toList().getFirst();
+            var response = FileProperties.response(List.of(extInfo), List.of()).extract().stream().toList().getFirst();
 
             assertEquals("test-dummy", response.fileName());
             assertFalse(response.isEncrypted());
@@ -69,14 +71,14 @@ public class ObjectResponseTest {
     class ExtractionResponseTest {
         @Test
         void expectsResponseIfFileListContainsElements() {
-            var extResponse = ExtractionResponse.response(new FileProperties(List.of(extInfo)));
+            var extResponse = ExtractionResponse.response(new FileProperties(List.of(extInfo), List.of()));
             assertEquals("Success! File(s) extracted properly!", extResponse.message());
             assertEquals("202 ACCEPTED", extResponse.status().toString());
             assertNotNull(extResponse.timestamp());
         }
         @Test
         void expectsResponseIfFileListIsEmpty() {
-            var extResponse = ExtractionResponse.response(new FileProperties(List.of()));
+            var extResponse = ExtractionResponse.response(new FileProperties(List.of(), List.of()));
             assertEquals("Not a single file was extracted!", extResponse.message());
             assertEquals("202 ACCEPTED", extResponse.status().toString());
             assertNotNull(extResponse.timestamp());
