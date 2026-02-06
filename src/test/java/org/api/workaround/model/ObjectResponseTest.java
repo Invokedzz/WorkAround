@@ -73,14 +73,14 @@ public class ObjectResponseTest {
         void expectsResponseIfFileListContainsElements() {
             var extResponse = ExtractionResponse.response(new FileProperties(List.of(extInfo), List.of()));
             assertEquals("Success! File(s) extracted properly!", extResponse.message());
-            assertEquals("202 ACCEPTED", extResponse.status().toString());
+            assertEquals(HttpStatus.ACCEPTED.toString(), extResponse.status().toString());
             assertNotNull(extResponse.timestamp());
         }
         @Test
         void expectsResponseIfFileListIsEmpty() {
             var extResponse = ExtractionResponse.response(new FileProperties(List.of(), List.of()));
             assertEquals("Not a single file was extracted!", extResponse.message());
-            assertEquals("202 ACCEPTED", extResponse.status().toString());
+            assertEquals(HttpStatus.ACCEPTED.toString(), extResponse.status().toString());
             assertNotNull(extResponse.timestamp());
         }
     }
@@ -90,7 +90,7 @@ public class ObjectResponseTest {
         @Test
         void expectsProperResponse() {
             assertEquals("error-test-message", exResp.errorMessages().getFirst());
-            assertEquals("400 BAD_REQUEST", exResp.httpStatus().toString());
+            assertEquals(HttpStatus.BAD_REQUEST.toString(), exResp.httpStatus().toString());
             assertNotNull(exResp.timestamp());
         }
     }

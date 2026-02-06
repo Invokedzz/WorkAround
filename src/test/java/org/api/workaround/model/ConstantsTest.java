@@ -35,6 +35,7 @@ public class ConstantsTest {
         void expectsCorrectBytesValue() {
             assertEquals("bytes", DigitalInformation.BYTES.toString());
         }
+
         @Test
         void expectsCorrectKbValue() {
             assertEquals("kb", DigitalInformation.KB.toString());

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -49,11 +51,13 @@ public class FileControllerTest {
     @Test
     void shouldPerformPostRequestThenGetRarFileInfo() throws Exception {
         var infos = List.of(extInfo);
+
         when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(FileProperties.response(infos, List.of()));
         var info = infos.getFirst();
+
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(jsonPath("message").value("Success! File(s) extracted properly!"))
-                .andExpect(jsonPath("status").value("202 ACCEPTED"))
+                .andExpect(jsonPath("status").value(HttpStatus.ACCEPTED.toString()))
                 .andExpect(jsonPath("properties.extract_info[0].file_name").value(info.fileName()))
                 .andExpect(jsonPath("properties.extract_info[0].file_size").value(info.fileSize()))
                 .andExpect(jsonPath("properties.extract_info[0].is_encrypted").value(info.isEncrypted()))
@@ -63,8 +67,52 @@ public class FileControllerTest {
                 .andExpect(jsonPath("properties.extract_info[0].header_info.is_multi_volume").value(info.header().isMultiVolume()))
                 .andExpect(jsonPath("properties.extract_info[0].header_info.is_encrypted").value(info.header().isEncrypted()))
                 .andExpect(jsonPath("properties.extract_info[0].header_info.is_protected").value(info.header().isProtected()))
+                .andExpect(jsonPath("properties.latest_uploads").isEmpty())
                 .andExpect(status().isAccepted());
+
         verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));
+    }
+
+    @Test
+    void shouldPerformPostRequestThenGetRecentUpload() throws Exception {
+        var infos = List.of(extInfo);
+        var upload = new Upload("upload-test", "10MB", ZonedDateTime.now());
+
+        when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(FileProperties.response(infos, List.of(upload)));
+
+        test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                .andExpect(jsonPath("properties.latest_uploads").isNotEmpty())
+                .andExpect(jsonPath("properties.latest_uploads[0].file_name").value(upload.fileName()))
+                .andExpect(jsonPath("properties.latest_uploads[0].file_size").value(upload.fileSize()))
+                .andExpect(jsonPath("properties.latest_uploads[0].uploaded_at").isNotEmpty())
+                .andExpect(status().isAccepted());
+
+        verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));
+    }
+
+    @Test
+    void shouldPerformPostRequestThenGetMultipleUploads() throws Exception {
+        var infos = List.of(extInfo);
+
+        var uploadOne = new Upload("upload-test", "10MB", ZonedDateTime.now());
+        var uploadTwo = new Upload("upload-test-2", "15MB", ZonedDateTime.now());
+        var uploadThree = new Upload("upload-test-3", "20MB", ZonedDateTime.now());
+
+        var uploads = List.of(uploadOne, uploadTwo, uploadThree);
+
+        when(fileService.extractRar(any(FileRequest.class), eq(true))).thenReturn(FileProperties.response(infos, uploads));
+
+        for (var i = 0; i < uploads.size(); i++) {
+            var getUp = uploads.get(i);
+            test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                    .andExpect(jsonPath("properties.latest_uploads").isNotEmpty())
+                    .andExpect(jsonPath(String.format("properties.latest_uploads[%d].file_name", i)).value(getUp.fileName()))
+                    .andExpect(jsonPath(String.format("properties.latest_uploads[%d].file_size", i)).value(getUp.fileSize()))
+                    .andExpect(jsonPath(String.format("properties.latest_uploads[%d].uploaded_at", i)).isNotEmpty())
+                    .andExpect(status().isAccepted());
+        }
+
+        verify(fileService, times(uploads.size())).extractRar(any(FileRequest.class), eq(true));
     }
 
     @Test
@@ -72,7 +120,7 @@ public class FileControllerTest {
         when(fileService.extractRar(any(FileRequest.class), eq(true))).thenThrow(new FailedExtractionException("mock"));
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()))
                 .andExpect(jsonPath("error_messages[0]").value("mock"))
-                .andExpect(jsonPath("status").value("400 BAD_REQUEST"))
+                .andExpect(jsonPath("status").value(HttpStatus.BAD_REQUEST.toString()))
                 .andExpect(jsonPath("timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest());
         verify(fileService, times(1)).extractRar(any(FileRequest.class), eq(true));

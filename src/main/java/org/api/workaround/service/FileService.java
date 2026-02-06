@@ -18,14 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
 public class FileService {
 
     private final DirectoryService directoryService;
+
     private final static int FILE_CONTAINER_SIZE_LIMIT = 3;
     private final static Logger log = LogManager.getLogger(FileService.class);
+    private final static ZonedDateTime CURRENT_TIMESTAMP = ZonedDateTime.now();
 
     private final Set<Upload> uploads = Collections.synchronizedSet(new LinkedHashSet<>());
 
@@ -59,7 +62,7 @@ public class FileService {
                 ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);
                 if (info != null) {
                     extractions.add(info);
-                    var upload = new Upload(fileName, info.fileSize());
+                    var upload = new Upload(fileName, info.fileSize(), CURRENT_TIMESTAMP);
                     uploadInsertionLogic(upload);
                 }
                 if (index != passwords.length - 1) {
