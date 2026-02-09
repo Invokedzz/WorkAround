@@ -56,7 +56,7 @@ public class FileService {
 
             for (var file : files) {
                 RarValidation.validate(file);
-                String fileName = file.getOriginalFilename();
+                String fileName = file.getResource().getFilename();
                 assert fileName != null;
                 Path directory = directoryService.getDirectory(fileName, shouldReplace), filePath = directory.resolve(fileName);
                 ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);

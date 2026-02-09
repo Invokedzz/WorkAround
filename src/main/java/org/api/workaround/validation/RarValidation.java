@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RarValidation extends ValidationUtility {
+public abstract class RarValidation extends FileValidation {
 
     private final static int FILE_SIZE_LIMIT = 300_000_000; // 300MB
     private final static String[] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.toString(), FileFormat.CBR.toString()};

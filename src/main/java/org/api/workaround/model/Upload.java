@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
 
-public record Upload(@JsonProperty("file_name") String fileName,
+public record Upload(
+        @JsonProperty("file_name")
+        String fileName,
         @JsonProperty("file_size")
         String fileSize,
         @JsonProperty("uploaded_at")

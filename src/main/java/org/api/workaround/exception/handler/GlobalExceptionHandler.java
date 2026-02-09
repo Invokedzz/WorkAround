@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
     // So I needed to create this aberration in order to deal with it
     @ExceptionHandler({
             UnableToCreateDirectoryException.class, InvalidFileException.class,
-            FailedExtractionException.class, CrcErrorException.class
+            FailedExtractionException.class, CrcErrorException.class,
+            PathTransversalException.class
     })
     public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
         ExceptionResponse resp = null;

@@ -1,10 +1,16 @@
 package org.api.workaround.validation;
 
+import org.api.workaround.exception.PathTransversalException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Objects;
 
-public abstract class ValidationUtility {
+public abstract class FileValidation {
+
+    public static boolean isFileAbsolute(File file) {
+        return file.isAbsolute();
+    }
 
     protected static boolean isFileEmpty(MultipartFile file) {
         return file.isEmpty();
