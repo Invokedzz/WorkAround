@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "transversal-cases": [
+    {
+      "type": "Basic traversal",
+      "case": "../../"
+    },
+    {
+      "type": "Basic traversal",
+      "case": "../../../../../../etc/passwd"
+    },
+    {
+      "type": "Basic traversal",
+      "case": "../../../../../home/users/.ssh/mock_id"
+    },
+    {
+      "type": "Windows style",
+      "case": "..\\..\\windows\\system32\\config\\sam"
+    },
+    {
+      "type": "Windows style",
+      "case": "..\\..\\..\\boot.ini"
+    },
+    {
+      "type": "Mixed separators",
+      "case": "..\\/..\\/etc/passwd"
+    },
+    {
+      "type": "Mixed separators",
+      "case": "..\\../\\..\\../etc/passwd"
+    },
+    {
+      "type": "Sneaky transversal",
+      "case": "....//....//etc/passwd"
+    },
+    {
+      "type": "Sneaky transversal",
+      "case": "..../etc/passwd"
+    },
+    {
+      "type": "Sneaky transversal",
+      "case": "..//..//etc/passwd"
+    },
+    {
+      "type": "Absolute path",
+      "case": "/etc/passwd"
+    },
+    {
+      "type": "Absolute path",
+      "case": "//etc/passwd"
+    },
+    {
+      "type": "Null byte injection",
+      "case": "../../etc/passwd%00.jpg"
+    },
+    {
+      "type": "Traversal inside filenames",
+      "case": "safe/../../evil.txt"
+    },
+    {
+      "type": "Traversal inside filenames",
+      "case": "uploads/..%2f..%2fconfig.yml"
+    },
+    {
+      "type": "Traversal inside filenames",
+      "case": "images/../secrets/.env"
+    },
+    {
+      "type": "Weird edge-cases",
+      "case": "."
+    },
+    {
+      "type": "Weird edge-cases",
+      "case": ".."
+    },
+    {
+      "type": "Weird edge-cases",
+      "case": "./../"
+    },
+    {
+      "type": "Weird edge-cases",
+      "case": "/././../etc/passwd"
+    },
+    {
+      "type": "URL-encoded",
+      "case": "%2e%2e%2f%2e%2e%2fetc%2fpasswd"
+    },
+    {
+      "type": "URL-encoded",
+      "case": "..%2f..%2fetc%2fpasswd"
+    },
+    {
+      "type": "Unix-style paths",
+      "case": "../../etc/passwd"
+    },
+    {
+      "type": "Unix-style paths",
+      "case": "../../var/www/html/index.php"
+    },
+    {
+      "type": "Unix-style paths",
+      "case": ".././.././../etc/passwd"
+    }
+  ]
+}

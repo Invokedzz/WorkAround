@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 @Service
 public class DirectoryService {
@@ -22,6 +23,8 @@ public class DirectoryService {
     @Value("${storage.root.rar}")
     private String storageRoot;
     private final static Logger log = LogManager.getLogger(DirectoryService.class);
+
+    private final static Pattern TRANSVERSAL_REGEX_CASES = Pattern.compile("(?i)(?:\\.\\.|%2e%2e)(?:/|\\\\|%2f|%5c|%25(?:2f|5c))");
 
     /**
      * Creates or replaces an existing directory, then return it
@@ -64,6 +67,7 @@ public class DirectoryService {
         }
     }
 
+    // TODO: handle unicodes, Windows-style, URL-encoded (double encoded)
     private boolean isDirectoryTransversal(File file) throws IOException {
         String pathUsingCanonical;
         String pathUsingAbsolute;
@@ -72,6 +76,9 @@ public class DirectoryService {
         }
         pathUsingCanonical = file.getCanonicalPath();
         pathUsingAbsolute = file.getAbsolutePath();
+        if (TRANSVERSAL_REGEX_CASES.matcher(pathUsingAbsolute).find() || TRANSVERSAL_REGEX_CASES.matcher(pathUsingCanonical).find()) {
+            return true;
+        }
         return isAbsolutePathIsNotEqualsToCanon(pathUsingAbsolute, pathUsingCanonical);
     }
 
