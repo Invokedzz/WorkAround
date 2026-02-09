@@ -90,6 +90,10 @@
       "case": "..%2f..%2fetc%2fpasswd"
     },
     {
+      "type": "URL-encoded (double encoded)",
+      "case": "%252e%252e%252fetc%252fpasswd"
+    },
+    {
       "type": "Unix-style paths",
       "case": "../../etc/passwd"
     },
@@ -100,6 +104,14 @@
     {
       "type": "Unix-style paths",
       "case": ".././.././../etc/passwd"
+    },
+    {
+      "type": "Unicode/Odd encodings",
+      "case": "..%c0%af..%c0%afetc%c0%afpasswd"
+    },
+    {
+      "type": "Unicode/Odd encodings",
+      "case": "..%u2215..%u2215etc%u2215passwd"
     }
   ]
 }

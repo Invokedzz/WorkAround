@@ -78,8 +78,28 @@ public class DirectoryService {
         pathUsingAbsolute = file.getAbsolutePath();
         if (TRANSVERSAL_REGEX_CASES.matcher(pathUsingAbsolute).find() || TRANSVERSAL_REGEX_CASES.matcher(pathUsingCanonical).find()) {
             return true;
+        } else if (isAbsolutePathIsNotEqualsToCanon(pathUsingAbsolute, pathUsingCanonical)) {
+            return true;
         }
-        return isAbsolutePathIsNotEqualsToCanon(pathUsingAbsolute, pathUsingCanonical);
+
+        return isUrlDoubleEncodedOrContainsUnicode(pathUsingCanonical);
+    }
+
+    private boolean isUrlDoubleEncodedOrContainsUnicode(String canonicalPath) {
+        final var encodes = new String[]{
+                "%252e", "%252f", "%255c",
+                "%u002e", "%u2215", "%u2216",
+                "%c0%2e", "%e0%40%ae", "%c0%ae",
+                "%c0%af", "%e0%80%af", "%c0%2f",
+                "%c0%5c", "%c0%80%5c"
+        };
+        for (var encode : encodes) {
+            if (canonicalPath.contains(encode)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isAbsolutePathIsNotEqualsToCanon(String pathUsingAbsolute, String pathUsingCanonical) {
