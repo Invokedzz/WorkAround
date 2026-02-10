@@ -1,6 +1,5 @@
 package org.api.workaround.validation;
 
-import org.api.workaround.exception.PathTransversalException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
