@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
+// TODO: enforce a better password handling
 public class FileService {
 
     private final DirectoryService directoryService;

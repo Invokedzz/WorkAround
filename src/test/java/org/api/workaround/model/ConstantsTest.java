@@ -15,17 +15,17 @@ public class ConstantsTest {
     @Nested
     class FileFormatTests {
         @Test
-        void expectsCorrectRarValue() {
+        void expectsRarValue() {
             assertEquals(".rar", FileFormat.RAR.toString());
         }
 
         @Test
-        void expectsCorrectCbrValue() {
+        void expectsCbrValue() {
             assertEquals(".cbr", FileFormat.CBR.toString());
         }
 
         @Test
-        void expectsCorrectPdfValue() {
+        void expectsPdfValue() {
             assertEquals(".pdf", FileFormat.PDF.toString());
         }
     }
@@ -33,22 +33,22 @@ public class ConstantsTest {
     @Nested
     class DigitalInformationTests {
         @Test
-        void expectsCorrectBytesValue() {
+        void expectsBytesValue() {
             assertEquals("bytes", DigitalInformation.BYTES.toString());
         }
 
         @Test
-        void expectsCorrectKbValue() {
+        void expectsKbValue() {
             assertEquals("kb", DigitalInformation.KB.toString());
         }
 
         @Test
-        void expectsCorrectMbValue() {
+        void expectsMbValue() {
             assertEquals("mb", DigitalInformation.MB.toString());
         }
 
         @Test
-        void expectsCorrectGbValue() {
+        void expectsGbValue() {
             assertEquals("gb", DigitalInformation.GB.toString());
         }
     }
@@ -56,13 +56,26 @@ public class ConstantsTest {
     @Nested
     class PunctuationTests {
         @Test
-        void expectsCorrectSlashValue() {
+        void expectsSlashValue() {
             assertEquals("/", Punctuation.SLASH.toString());
         }
 
         @Test
-        void expectsCorrectApostropheValue() {
+        void expectsApostropheValue() {
             assertEquals(",", Punctuation.APOSTROPHE.toString());
+        }
+
+        @Nested
+        class LiteralTests {
+            @Test
+            void expectsTrueLiteralValue() {
+                assertEquals("true", Punctuation.Literal.TRUE_LITERAL);
+            }
+
+            @Test
+            void expectsFalseLiteralValue() {
+                assertEquals("false", Punctuation.Literal.FALSE_LITERAL);
+            }
         }
     }
 

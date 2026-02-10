@@ -3,6 +3,7 @@ package org.api.workaround.controller;
 import org.api.workaround.model.ExtractionResponse;
 import org.api.workaround.model.FileRequest;
 import org.api.workaround.model.FileProperties;
+import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.service.FileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ public class FileController {
     )
     public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(
             MultipartHttpServletRequest http,
-            @RequestParam(required = false, defaultValue = "true") Boolean shouldReplace
+            @RequestParam(required = false, defaultValue = Punctuation.Literal.TRUE_LITERAL) Boolean shouldReplace
     )
     {
         var arch = fileService.extractRar(FileRequest.response(http.getMultiFileMap()), shouldReplace);

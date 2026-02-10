@@ -14,6 +14,11 @@ public enum Punctuation {
      */
     APOSTROPHE(",");
 
+    public static class Literal {
+        public static final String TRUE_LITERAL = "true";
+        public static final String FALSE_LITERAL = "false";
+    }
+
     private final String value;
 
     Punctuation(final String value) {
