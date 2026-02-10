@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.PathTransversalException;
 import org.api.workaround.exception.UnableToCreateDirectoryException;
+import org.api.workaround.model.enums.PathEncode;
 import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.validation.FileValidation;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +68,6 @@ public class DirectoryService {
         }
     }
 
-    // TODO: handle unicodes, Windows-style, URL-encoded (double encoded)
     private boolean isDirectoryTransversal(File file) throws IOException {
         String pathUsingCanonical;
         String pathUsingAbsolute;
@@ -86,19 +86,25 @@ public class DirectoryService {
     }
 
     private boolean isUrlDoubleEncodedOrContainsUnicode(String canonicalPath) {
-        final var encodes = new String[]{
-                "%252e", "%252f", "%255c",
-                "%u002e", "%u2215", "%u2216",
-                "%c0%2e", "%e0%40%ae", "%c0%ae",
-                "%c0%af", "%e0%80%af", "%c0%2f",
-                "%c0%5c", "%c0%80%5c"
-        };
-        for (var encode : encodes) {
-            if (canonicalPath.contains(encode)) {
+        String encodeValue;
+        final var encodes = PathEncode.values();
+
+        for (final var encode : encodes) {
+            encodeValue = encode.getValue();
+            if (canonicalPath.contains(encodeValue)) {
                 return true;
+            } else if (encode.getAlterValue() != null) {
+                encodeValue = encode.getAlterValue();
+                if (canonicalPath.contains(encodeValue)) {
+                    return true;
+                }
+            } else if (encode.getOtherAlterValue() != null) {
+                encodeValue = encode.getOtherAlterValue();
+                if (canonicalPath.contains(encodeValue)) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
