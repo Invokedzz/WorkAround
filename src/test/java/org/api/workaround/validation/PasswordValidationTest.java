@@ -1,6 +1,7 @@
 package org.api.workaround.validation;
 
 import org.api.workaround.exception.FileValidationException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("unit")
 public class PasswordValidationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

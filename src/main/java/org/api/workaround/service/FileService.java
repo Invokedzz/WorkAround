@@ -11,6 +11,7 @@ import org.api.workaround.exception.FailedExtractionException;
 import org.api.workaround.model.*;
 import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.model.enums.Punctuation;
+import org.api.workaround.validation.PasswordValidation;
 import org.api.workaround.validation.RarValidation;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,7 +87,12 @@ public class FileService {
             return new String[]{emptyStr};
         }
 
-        return password.trim().split(Punctuation.APOSTROPHE.toString());
+        var passwords = password.trim().split(Punctuation.APOSTROPHE.toString());
+        for (final var pass : passwords) {
+            PasswordValidation.validate(pass);
+        }
+
+        return passwords;
     }
 
     private ExtractionInformation performExtraction(MultipartFile file, String[] passwords, Path directory, Path filePath, int index) {

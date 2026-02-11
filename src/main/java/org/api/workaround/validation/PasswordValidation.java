@@ -26,7 +26,7 @@ public abstract class PasswordValidation {
         }
 
         if (!password.matches("^[0-9]+$") && !password.matches("^[a-zA-Z]+$") && !password.matches("^[0-9a-zA-Z]+$")) {
-            messages.add("Password must contain at least letters or numbers!");
+            messages.add("Password must contain letters or numbers!");
         }
 
         throwsIfMessageListIsNotEmpty(messages);

@@ -4,6 +4,7 @@ import com.github.junrar.rarfile.RARVersion;
 import com.github.junrar.rarfile.UnrarHeadertype;
 import org.apache.commons.io.FileUtils;
 import org.api.workaround.exception.FailedExtractionException;
+import org.api.workaround.exception.FileValidationException;
 import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.model.FileRequest;
 import org.api.workaround.model.enums.Punctuation;
@@ -94,9 +95,56 @@ public class FileServiceTest {
         var mpFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(
                 FailedExtractionException.class,
-                () -> fileService.extractRar(new FileRequest(Map.of("wrong-password", List.of(mpFile))), true)
+                () -> fileService.extractRar(new FileRequest(Map.of("wrongpassword", List.of(mpFile))), true)
         );
-
         assertEquals(FailedExtractionException.class, ex.getClass());
+    }
+
+    @Test
+    void shouldThrowIfPasswordContainsSpecialChars() throws Exception {
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
+        var mpFile = FileConverter.convertFileToMultipartFile(file);
+        final var ex = assertThrows(
+                FileValidationException.class,
+                () -> fileService.extractRar(new FileRequest(Map.of("@_hello", List.of(mpFile))), true)
+        );
+        assertEquals(1, ex.getErrors().size());
+        assertEquals(FileValidationException.class, ex.getClass());
+        assertEquals("Password must contain letters or numbers!", ex.getErrors().stream().toList().getFirst());
+    }
+
+    @Test
+    void shouldThrowIfPasswordSurpassesMaximumLength() throws Exception {
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
+        var mpFile = FileConverter.convertFileToMultipartFile(file);
+        var pass = new StringBuilder().repeat("a", 128).toString();
+        final var ex = assertThrows(
+                FileValidationException.class,
+                () -> fileService.extractRar(new FileRequest(Map.of(pass, List.of(mpFile))), true)
+        );
+        assertEquals(1, ex.getErrors().size());
+        assertEquals(FileValidationException.class, ex.getClass());
+        assertEquals(
+                String.format("Password cannot exceed limit of %d characters", pass.length() - 1),
+                ex.getErrors().stream().toList().getFirst()
+        );
+    }
+
+    @Test
+    void shouldThrowIfPasswordSurpassesMaximumLengthAndContainSpecialChars() throws Exception {
+        final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
+        var mpFile = FileConverter.convertFileToMultipartFile(file);
+        var pass = new StringBuilder().repeat("@", 128).toString();
+        final var ex = assertThrows(
+                FileValidationException.class,
+                () -> fileService.extractRar(new FileRequest(Map.of(pass, List.of(mpFile))), true)
+        );
+        assertEquals(2, ex.getErrors().size());
+        assertEquals(FileValidationException.class, ex.getClass());
+        assertEquals(
+                String.format("Password cannot exceed limit of %d characters", pass.length() - 1),
+                ex.getErrors().stream().toList().getFirst()
+        );
+        assertEquals("Password must contain letters or numbers!", ex.getErrors().stream().toList().get(1));
     }
 }
