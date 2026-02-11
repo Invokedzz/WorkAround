@@ -110,7 +110,7 @@ public class FileServiceTest {
         );
         assertEquals(1, ex.getErrors().size());
         assertEquals(FileValidationException.class, ex.getClass());
-        assertEquals("Password must contain letters or numbers!", ex.getErrors().stream().toList().getFirst());
+        assertEquals("Password must contain letters, numbers or both of them!", ex.getErrors().stream().toList().getFirst());
     }
 
     @Test
@@ -145,6 +145,6 @@ public class FileServiceTest {
                 String.format("Password cannot exceed limit of %d characters", pass.length() - 1),
                 ex.getErrors().stream().toList().getFirst()
         );
-        assertEquals("Password must contain letters or numbers!", ex.getErrors().stream().toList().get(1));
+        assertEquals("Password must contain letters, numbers or both of them!", ex.getErrors().stream().toList().get(1));
     }
 }
