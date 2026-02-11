@@ -89,7 +89,8 @@ public class ObjectResponseTest {
     class ExceptionResponseTest {
         @Test
         void expectsProperResponse() {
-            assertEquals("error-test-message", exResp.errorMessages().getFirst());
+            var toList = exResp.errorMessages().stream().toList();
+            assertEquals("error-test-message", toList.getFirst());
             assertEquals(HttpStatus.BAD_REQUEST.toString(), exResp.httpStatus().toString());
             assertNotNull(exResp.timestamp());
         }

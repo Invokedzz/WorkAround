@@ -88,6 +88,7 @@ public class DirectoryService {
     private boolean isUrlDoubleEncodedOrContainsUnicode(String canonicalPath) {
         String encodeValue;
         final var encodes = PathEncode.values();
+
         for (final var encode : encodes) {
             encodeValue = encode.getValue();
             if (canonicalPath.contains(encodeValue)) {

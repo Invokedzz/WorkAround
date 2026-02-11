@@ -1,16 +1,16 @@
 package org.api.workaround.exception;
 
-import java.util.List;
+import java.util.Collection;
 
 public class FileValidationException extends RuntimeException {
 
-    private final List<String> errors;
+    private final Collection<String> errors;
 
-    public FileValidationException(List<String> errors){
+    public FileValidationException(Collection<String> errors){
         this.errors = errors;
     }
 
-    public List<String> getErrors() {
+    public Collection<String> getErrors() {
         return errors;
     }
 }

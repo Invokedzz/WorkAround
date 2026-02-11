@@ -24,10 +24,11 @@ public class RarValidationTest {
         final var file = new File(PATH + Punctuation.SLASH + "empty-file.txt");
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(FileValidationException.class, () -> RarValidation.validate(mtFile));
+        var toList = ex.getErrors().stream().toList();
         assertEquals(3, ex.getErrors().size());
-        assertEquals("File cannot be empty!", ex.getErrors().getFirst());
-        assertEquals("Oops! File type needs to be a .RAR or .CBR!", ex.getErrors().get(1));
-        assertEquals("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.", ex.getErrors().get(2));
+        assertEquals("File cannot be empty!", toList.getFirst());
+        assertEquals("Oops! File type needs to be a .RAR or .CBR!", toList.get(1));
+        assertEquals("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.", toList.get(2));
     }
 
     @Test
@@ -35,8 +36,9 @@ public class RarValidationTest {
         final var file = new File(PATH + Punctuation.SLASH + "test_1mb_v5.rar");
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(FileValidationException.class, () -> RarValidation.validate(mtFile));
+        var toList = ex.getErrors().stream().toList();
         assertEquals(1, ex.getErrors().size());
-        assertEquals("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.", ex.getErrors().getFirst());
+        assertEquals("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.", toList.getFirst());
     }
 
     @Test
@@ -46,8 +48,9 @@ public class RarValidationTest {
                 () -> RarValidation.validate(null),
                 "Oops! File cannot be null!"
         );
+        var toList = ex.getErrors().stream().toList();
         assertEquals(1, ex.getErrors().size());
-        assertEquals("Oops! File cannot be null!", ex.getErrors().getFirst());
+        assertEquals("Oops! File cannot be null!", toList.getFirst());
     }
 
     @Test
