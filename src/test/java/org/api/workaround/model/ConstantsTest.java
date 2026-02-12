@@ -1,9 +1,6 @@
 package org.api.workaround.model;
 
-import org.api.workaround.model.enums.DigitalInformation;
-import org.api.workaround.model.enums.FileFormat;
-import org.api.workaround.model.enums.PathEncode;
-import org.api.workaround.model.enums.Punctuation;
+import org.api.workaround.model.enums.*;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -139,6 +136,34 @@ public class ConstantsTest {
         @Test
         void expectsUtf8UnicodeOtherAlternativeSlashValue() {
             assertEquals("%c0%2f", PathEncode.UTF8_UNICODE_SLASH.getOtherAlterValue());
+        }
+    }
+
+    @Nested
+    class httpRequestMethodsTests {
+        @Test
+        void expectsGetMethodValue() {
+            assertEquals("GET", HttpRequestMethod.GET.toString());
+        }
+
+        @Test
+        void expectsPostMethodValue() {
+            assertEquals("POST", HttpRequestMethod.POST.toString());
+        }
+
+        @Test
+        void expectsPutMethodValue() {
+            assertEquals("PUT", HttpRequestMethod.PUT.toString());
+        }
+
+        @Test
+        void expectsPatchMethodValue() {
+            assertEquals("PATCH", HttpRequestMethod.PATCH.toString());
+        }
+
+        @Test
+        void expectsDeleteMethodValue() {
+            assertEquals("DELETE", HttpRequestMethod.DELETE.toString());
         }
     }
 }
