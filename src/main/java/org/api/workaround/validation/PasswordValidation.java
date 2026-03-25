@@ -7,9 +7,7 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 public abstract class PasswordValidation {
-
     private final static int MAXIMUM_PASSWORD_LENGTH = 127;
-
     private final static Pattern CONTAINS_ONLY_NUMBERS = Pattern.compile("^[0-9]+$");
     private final static Pattern CONTAINS_ONLY_LETTERS = Pattern.compile("^[a-zA-Z]+$");
     private final static Pattern CONTAIN_BOTH_LETTERS_AND_NUMBERS = Pattern.compile("^[0-9a-zA-Z]+$");

@@ -24,6 +24,10 @@ public enum DigitalInformation {
      */
     BYTES("bytes");
 
+    public static class StandardFileProperties {
+        public final static String MAX_FILES_AVAILABLE = "8";
+    }
+
     private final String value;
 
     DigitalInformation(final String value) {

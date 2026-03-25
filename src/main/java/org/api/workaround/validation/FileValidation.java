@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.Objects;
 
 public abstract class FileValidation {
-
     public static boolean isFileAbsolute(File file) {
         return file.isAbsolute();
     }

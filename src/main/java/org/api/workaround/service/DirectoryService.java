@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class DirectoryService {
-
     @Value("${storage.root.rar}")
     private String storageRoot;
     private final static Logger log = LogManager.getLogger(DirectoryService.class);

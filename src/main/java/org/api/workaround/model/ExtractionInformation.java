@@ -6,13 +6,7 @@ import com.github.junrar.rarfile.RARVersion;
 public record ExtractionInformation(
         @JsonProperty("file_name")
         String fileName,
-        @JsonProperty("is_encrypted")
-        boolean isEncrypted,
-        @JsonProperty("is_protected")
-        boolean isPasswordProtected,
         @JsonProperty("file_size")
         String fileSize,
-        RARVersion version,
-        @JsonProperty("header_info")
-        RarHeaderProperties header
+        RARVersion version
 ) {}

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RarValidation extends FileValidation {
-
+    public final static byte[] OLD_RAR_SIGNATURE = {0x45, 0x7e, 0x5e};
+    public final static byte[] V4_SIGNATURE = {0x61, 0x72, 0x21, 0x1a, 0x07, 0x00};
+    public final static byte[] V5_SIGNATURE = {0x52, 0x61, 0x72, 0x21, 0x1A,  0x07, 0x01, 0x00};
     private final static int FILE_SIZE_LIMIT = 300_000_000; // 300MB
     private final static String[] AVAILABLE_FILE_FORMATS = {FileFormat.RAR.toString(), FileFormat.CBR.toString()};
 
@@ -39,47 +41,10 @@ public abstract class RarValidation extends FileValidation {
             messages.add("Oops! File size cannot exceed 300MB!");
         }
 
-        if (!isHeaderValid(file)) {
-            messages.add("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.");
-        }
-
         throwsIfMessageListIsNotEmpty(messages);
     }
 
     private static void throwsIfMessageListIsNotEmpty(List<String> messages) {
         if (!messages.isEmpty()) throw new FileValidationException(messages);
-    }
-
-    private static boolean isHeaderValid(MultipartFile file) {
-        try {
-            byte[] bytes = file.getResource().getContentAsByteArray();
-            if (bytes.length >= 4 && bytes[0] == 0x52) {
-                if (isRarVersionV5(bytes)) {
-                    return false;
-                }
-                else if (isRarVersionOld(bytes)) {
-                    return true;
-                }
-                else if (isRarVersionV4(bytes)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            throw new InvalidFileException(e.getMessage());
-        }
-        return false;
-    }
-
-    private static boolean isRarVersionV5(byte... bytes) {
-        return bytes[6] == 0x01;
-    }
-
-    private static boolean isRarVersionOld(byte... bytes) {
-        return bytes[1] == 0x45 && bytes[2] == 0x7e && bytes[3] == 0x5e;
-    }
-
-    private static boolean isRarVersionV4(byte... bytes) {
-        return  bytes[1] == 0x61 && bytes[2] == 0x72 && bytes[3] == 0x21 &&
-                bytes[4] == 0x1a && bytes[5] == 0x07 && bytes[6] == 0x00;
     }
 }

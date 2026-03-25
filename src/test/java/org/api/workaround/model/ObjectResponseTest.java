@@ -1,7 +1,6 @@
 package org.api.workaround.model;
 
 import com.github.junrar.rarfile.RARVersion;
-import com.github.junrar.rarfile.UnrarHeadertype;
 import org.api.workaround.exception.handler.ExceptionResponse;
 import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.util.FileConverter;
@@ -36,7 +35,7 @@ public class ObjectResponseTest {
         void expectsProperResponse() throws Exception {
             final var file = Path.of(FILES_PATH + "/rar4.rar");
             var multipart = FileConverter.convertFileToMultipartFile(file.toFile());
-            var response = FileRequest.response(Map.of("no-password-allowed", List.of(multipart)));
+            var response = FileRequest.response(Map.of("no-password-allowed", List.of(multipart)), true, 10);
 
             var getFiles = response.files().values().stream().map(List::getFirst).toList();
 
@@ -44,26 +43,6 @@ public class ObjectResponseTest {
             assertEquals(1, response.files().size());
             assertEquals("[no-password-allowed]", response.files().keySet().toString());
             assertEquals("rar4.rar", getFiles.getFirst().getOriginalFilename());
-        }
-    }
-
-    @Nested
-    class FilePropertiesResponseTest {
-        @Test
-        void expectsProperResponse() {
-            var response = FileProperties.response(List.of(extInfo), List.of()).extract().stream().toList().getFirst();
-
-            assertEquals("test-dummy", response.fileName());
-            assertFalse(response.isEncrypted());
-            assertFalse(response.isPasswordProtected());
-            assertEquals("0mb", response.fileSize());
-            assertEquals(RARVersion.V4.toString(), response.version().toString());
-
-            assertNotNull(response.header());
-            assertFalse(response.header().isMultiVolume());
-            assertFalse(response.header().isProtected());
-            assertFalse(response.header().isEncrypted());
-            assertEquals(UnrarHeadertype.MainHeader, response.header().headerType());
         }
     }
 
@@ -97,10 +76,7 @@ public class ObjectResponseTest {
     }
 
     private ExtractionInformation getExtractionInformation(String fileName) {
-       return new ExtractionInformation(
-               fileName, false, false, "0" + DigitalInformation.MB, RARVersion.V4,
-               new RarHeaderProperties(UnrarHeadertype.MainHeader, false, false, false)
-       );
+       return new ExtractionInformation(fileName, "0" + DigitalInformation.MB, RARVersion.V4);
     }
 
     private ExceptionResponse getExceptionResponse() {
