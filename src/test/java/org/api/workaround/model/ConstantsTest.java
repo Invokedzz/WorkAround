@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
 public class ConstantsTest {
@@ -66,12 +66,12 @@ public class ConstantsTest {
         class LiteralTests {
             @Test
             void expectsTrueLiteralValue() {
-                assertEquals("true", Punctuation.Literal.TRUE_LITERAL);
+                assertTrue(Punctuation.Literal.TRUE_LITERAL);
             }
 
             @Test
             void expectsFalseLiteralValue() {
-                assertEquals("false", Punctuation.Literal.FALSE_LITERAL);
+                assertFalse(Punctuation.Literal.FALSE_LITERAL);
             }
         }
     }

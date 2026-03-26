@@ -53,7 +53,7 @@ public enum PathEncode {
     private final String alterValue;
     private final String otherAlterValue;
 
-    PathEncode(final String value, final String alterValue, final String otherAlterValue) {
+    PathEncode(String value, String alterValue, String otherAlterValue) {
         this.value = value;
         this.alterValue = alterValue;
         this.otherAlterValue = otherAlterValue;

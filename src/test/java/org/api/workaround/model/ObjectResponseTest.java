@@ -35,7 +35,7 @@ public class ObjectResponseTest {
         void expectsProperResponse() throws Exception {
             final var file = Path.of(FILES_PATH + "/rar4.rar");
             var multipart = FileConverter.convertFileToMultipartFile(file.toFile());
-            var response = FileRequest.response(Map.of("no-password-allowed", List.of(multipart)), true, 10);
+            var response = RarBridgeRequest.get(Map.of("no-password-allowed", List.of(multipart)), true, 10);
 
             var getFiles = response.files().values().stream().map(List::getFirst).toList();
 

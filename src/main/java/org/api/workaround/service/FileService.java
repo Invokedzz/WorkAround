@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FailedExtractionException;
+import org.api.workaround.exception.FileValidationException;
 import org.api.workaround.model.*;
 import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.model.enums.Punctuation;
@@ -20,17 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
-// TODO: enforce a better password handling
 public class FileService {
     private final DirectoryService directoryService;
 
-    private final static int FILE_CONTAINER_SIZE_LIMIT = Integer.parseInt(DigitalInformation.StandardFileProperties.MAX_FILES_AVAILABLE);
+    private final static int FILE_CONTAINER_SIZE_LIMIT = DigitalInformation.StandardFileProperties.MAX_FILES_AVAILABLE;
     private final static Logger log = LogManager.getLogger(FileService.class);
-    private final static ZonedDateTime CURRENT_TIMESTAMP = ZonedDateTime.now();
 
     private final Set<Upload> uploads = Collections.synchronizedSet(new LinkedHashSet<>());
 
@@ -44,13 +44,14 @@ public class FileService {
      * @return a collection of files that were successfully extracted
      * @throws FailedExtractionException if something goes wrong in the operation
      */
-    public FileProperties extractRar(FileRequest request) {
+    public FileProperties extractRar(RarBridgeRequest request) {
         var extractions = new ArrayList<ExtractionInformation>();
         for (var entry : request.files().entrySet()) {
             List<MultipartFile> files = entry.getValue();
             String[] passwords = handlePassword(entry.getKey());
+
             if (!isRarRequestValid(files)) {
-                return FileProperties.response(extractions, uploads);
+                return FileProperties.get(extractions, uploads);
             }
 
             int index = 0;
@@ -58,9 +59,10 @@ public class FileService {
             for (var file : files) {
                 RarValidation.validate(file);
                 String fileName = file.getResource().getFilename();
+
                 if (fileName != null) {
                     Path directory = directoryService.getDirectory(fileName, request.shouldReplace()), filePath = directory.resolve(fileName);
-                    ExtractionInformation info = performExtraction(file, passwords, directory, filePath, index);
+                    ExtractionInformation info = handleExtraction(file, passwords, directory, filePath, index);
 
                     if (info != null) {
                         extractions.add(info);
@@ -71,7 +73,8 @@ public class FileService {
                             fileCapacity = FILE_CONTAINER_SIZE_LIMIT;
                         }
 
-                        var upload = new Upload(fileName, info.fileSize(), CURRENT_TIMESTAMP);
+                        var timestamp = LocalDateTime.now(ZoneId.systemDefault());
+                        var upload = new Upload(fileName, info.fileSize(), timestamp);
                         uploadInsertionLogic(upload, fileCapacity);
                     }
 
@@ -82,7 +85,7 @@ public class FileService {
             }
         }
         synchronized (uploads) {
-            return FileProperties.response(extractions, uploads);
+            return FileProperties.get(extractions, uploads);
         }
    }
 
@@ -104,6 +107,14 @@ public class FileService {
         return passwords;
     }
 
+    private ExtractionInformation handleExtraction(MultipartFile file, String[] passwords, Path directory, Path filePath, int index) {
+        try {
+            return performExtraction(file, passwords, directory, filePath, index);
+        } catch (FileValidationException e) {
+            throw new FileValidationException(e.getErrors());
+        }
+    }
+
     private ExtractionInformation performExtraction(MultipartFile file, String[] passwords, Path directory, Path filePath, int index) {
         File cmf = null;
 
@@ -114,8 +125,8 @@ public class FileService {
                 if (cmf.isFile() && cmf.canRead()) {
                     ExtractionInformation response = null;
 
-                    var signature = RarValidation.V5_SIGNATURE;
-                    var originalFileBytes = Files.readAllBytes(cmf.toPath());
+                    byte[] signature = RarValidation.V5_SIGNATURE;
+                    byte[] originalFileBytes = Files.readAllBytes(cmf.toPath());
                     var isRar5 = true;
 
                     for (var i = 0; i < signature.length; i++) {
@@ -131,6 +142,12 @@ public class FileService {
                         if (extract.isSuccess()) {
                             String rarSize = convertBytesToDeterminedFormat(reqBytes);
                             response = getExtractInfo(file, RARVersion.V5, rarSize);
+                        }
+                        else {
+                            if (extract.errorCount > 0) {
+                                var errors = extract.errors.stream().map(e -> e.errorMessage).toList();
+                                throw new FileValidationException(errors);
+                            }
                         }
                     }
                     else {
@@ -158,6 +175,7 @@ public class FileService {
         } finally {
             deleteTempFileAfterExtraction(cmf);
         }
+
         return null;
     }
 
@@ -237,38 +255,31 @@ public class FileService {
     }
 
     private static boolean isRarVersionOld(byte[] fileAsBytes) {
-        var signature = RarValidation.OLD_RAR_SIGNATURE;
-        var isOld = true;
-        var signatureTracker = 0;
-
-        for (var i = 1; i < signature.length; i++) {
-            if (fileAsBytes[signatureTracker + 1] != signature[signatureTracker]) {
-                isOld = false;
-                break;
-            }
-            signatureTracker++;
-        }
-
-        return isOld;
+        byte[] signature = RarValidation.OLD_RAR_SIGNATURE;
+        return CheckOldRarVersionsBytes(fileAsBytes, signature);
     }
 
     private static boolean isRarVersionV4(byte[] fileAsBytes) {
-        var signature = RarValidation.V4_SIGNATURE;
-        var isV4 = true;
+        byte[] signature = RarValidation.V4_SIGNATURE;
+        return CheckOldRarVersionsBytes(fileAsBytes, signature);
+    }
+
+    private static boolean CheckOldRarVersionsBytes(byte[] fileAsBytes, byte[] signature) {
+        var isVersion = true;
         var signatureTracker = 0;
 
         for (var i = 0; i < signature.length; i++) {
             if (fileAsBytes[signatureTracker + 1] != signature[signatureTracker]) {
-                isV4 = false;
+                isVersion = false;
                 break;
             }
             signatureTracker++;
         }
 
-        return isV4;
+        return isVersion;
     }
 
     private ExtractionInformation getExtractInfo(MultipartFile file, RARVersion version, String rarSize) throws RarException {
-        return new ExtractionInformation(file.getOriginalFilename(), rarSize, version);
+        return new ExtractionInformation(file.getResource().getFilename(), rarSize, version);
     }
 }

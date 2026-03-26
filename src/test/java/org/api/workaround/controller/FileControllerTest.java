@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class FileControllerTest {
     void shouldPerformPostRequestThenGetRarFileInfo() throws Exception {
         var infos = List.of(extInfo);
 
-        when(fileService.extractRar(any(FileRequest.class))).thenReturn(FileProperties.response(infos, List.of()));
+        when(fileService.extractRar(any(RarBridgeRequest.class))).thenReturn(FileProperties.get(infos, List.of()));
         var info = infos.getFirst();
 
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
@@ -65,15 +66,15 @@ public class FileControllerTest {
                 .andExpect(jsonPath("properties.latest_uploads").isEmpty())
                 .andExpect(status().isAccepted());
 
-        verify(fileService, times(1)).extractRar(any(FileRequest.class));
+        verify(fileService, times(1)).extractRar(any(RarBridgeRequest.class));
     }
 
     @Test
     void shouldPerformPostRequestThenGetRecentUpload() throws Exception {
         var infos = List.of(extInfo);
-        var upload = new Upload("upload-test", "10MB", ZonedDateTime.now());
+        var upload = new Upload("upload-test", "10MB",  LocalDateTime.now());
 
-        when(fileService.extractRar(any(FileRequest.class))).thenReturn(FileProperties.response(infos, List.of(upload)));
+        when(fileService.extractRar(any(RarBridgeRequest.class))).thenReturn(FileProperties.get(infos, List.of(upload)));
 
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()).contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(jsonPath("properties.latest_uploads").isNotEmpty())
@@ -82,20 +83,20 @@ public class FileControllerTest {
                 .andExpect(jsonPath("properties.latest_uploads[0].uploaded_at").isNotEmpty())
                 .andExpect(status().isAccepted());
 
-        verify(fileService, times(1)).extractRar(any(FileRequest.class));
+        verify(fileService, times(1)).extractRar(any(RarBridgeRequest.class));
     }
 
     @Test
     void shouldPerformPostRequestThenGetMultipleUploads() throws Exception {
         var infos = List.of(extInfo);
 
-        var uploadOne = new Upload("upload-test", "10MB", ZonedDateTime.now());
-        var uploadTwo = new Upload("upload-test-2", "15MB", ZonedDateTime.now());
-        var uploadThree = new Upload("upload-test-3", "20MB", ZonedDateTime.now());
+        var uploadOne = new Upload("upload-test", "10MB", LocalDateTime.now());
+        var uploadTwo = new Upload("upload-test-2", "15MB",  LocalDateTime.now());
+        var uploadThree = new Upload("upload-test-3", "20MB", LocalDateTime.now());
 
         var uploads = List.of(uploadOne, uploadTwo, uploadThree);
 
-        when(fileService.extractRar(any(FileRequest.class))).thenReturn(FileProperties.response(infos, uploads));
+        when(fileService.extractRar(any(RarBridgeRequest.class))).thenReturn(FileProperties.get(infos, uploads));
 
         for (var i = 0; i < uploads.size(); i++) {
             var getUp = uploads.get(i);
@@ -107,17 +108,17 @@ public class FileControllerTest {
                     .andExpect(status().isAccepted());
         }
 
-        verify(fileService, times(uploads.size())).extractRar(any(FileRequest.class));
+        verify(fileService, times(uploads.size())).extractRar(any(RarBridgeRequest.class));
     }
 
     @Test
     void shouldReturnBadRequestIfOperationFails() throws Exception {
-        when(fileService.extractRar(any(FileRequest.class))).thenThrow(new FailedExtractionException("mock"));
+        when(fileService.extractRar(any(RarBridgeRequest.class))).thenThrow(new FailedExtractionException("mock"));
         test.perform(multipart("/v1/rar").file("test", mpFile.getBytes()))
                 .andExpect(jsonPath("error_messages[0]").value("mock"))
                 .andExpect(jsonPath("status").value(HttpStatus.BAD_REQUEST.toString()))
                 .andExpect(jsonPath("timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest());
-        verify(fileService, times(1)).extractRar(any(FileRequest.class));
+        verify(fileService, times(1)).extractRar(any(RarBridgeRequest.class));
     }
 }

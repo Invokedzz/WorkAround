@@ -15,7 +15,7 @@ public record FileProperties(
      * @param extract information derived from .RAR/.CBR extraction
      * @return the response
      */
-    public static FileProperties response(Collection<ExtractionInformation> extract, Collection<Upload> latestUploads) {
+    public static FileProperties get(Collection<ExtractionInformation> extract, Collection<Upload> latestUploads) {
         return new FileProperties(extract, latestUploads);
     }
 }

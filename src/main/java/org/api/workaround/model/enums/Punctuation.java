@@ -15,13 +15,13 @@ public enum Punctuation {
     APOSTROPHE(",");
 
     public static class Literal {
-        public static final String TRUE_LITERAL = "true";
-        public static final String FALSE_LITERAL = "false";
+        public static final boolean TRUE_LITERAL = true;
+        public static final boolean FALSE_LITERAL = false;
     }
 
     private final String value;
 
-    Punctuation(final String value) {
+    Punctuation(String value) {
         this.value = value;
     }
 

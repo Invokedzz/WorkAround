@@ -1,8 +1,8 @@
 package org.api.workaround.controller;
 
-import org.api.workaround.model.ExtractionResponse;
-import org.api.workaround.model.FileRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.api.workaround.model.FileProperties;
+import org.api.workaround.model.RarBridgeRequest;
 import org.api.workaround.model.enums.DigitalInformation;
 import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.service.FileService;
@@ -26,13 +26,21 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(
+    public ResponseEntity<FileProperties> extractRarFile(
             MultipartHttpServletRequest http,
-            @RequestParam(required = false, defaultValue = Punctuation.Literal.TRUE_LITERAL) Boolean shouldReplace,
-            @RequestParam(required = false, defaultValue = DigitalInformation.StandardFileProperties.MAX_FILES_AVAILABLE) Integer maxFiles
+            @RequestPart("request") RarExtractionRequest request
     )
     {
-        var arch = fileService.extractRar(FileRequest.response(http.getMultiFileMap(), shouldReplace, maxFiles));
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExtractionResponse.response(arch));
+        var arch = fileService.extractRar(RarBridgeRequest.get(http.getMultiFileMap(), request.shouldReplace, request.maxFiles));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(arch);
+    }
+
+    public static class RarExtractionRequest {
+        // todo: fix
+        // Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Unrecognized token 'abc': was expecting
+        @JsonProperty("should_replace")
+        public boolean shouldReplace = Punctuation.Literal.TRUE_LITERAL;
+        @JsonProperty("max_files")
+        public int maxFiles = DigitalInformation.StandardFileProperties.MAX_FILES_AVAILABLE;
     }
 }

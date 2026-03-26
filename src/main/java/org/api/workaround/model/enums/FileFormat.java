@@ -21,7 +21,7 @@ public enum FileFormat {
 
     private final String value;
 
-    FileFormat(final String value) {
+    FileFormat(String value) {
         this.value = value;
     }
 
