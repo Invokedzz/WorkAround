@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.util.regex.Pattern;
+
 @RestController
 public class FileController {
 
@@ -31,16 +33,47 @@ public class FileController {
             @RequestPart("request") RarExtractionRequest request
     )
     {
-        var arch = fileService.extractRar(RarBridgeRequest.get(http.getMultiFileMap(), request.shouldReplace, request.maxFiles));
+        var arch = fileService.extractRar(RarBridgeRequest.get(http.getMultiFileMap(), request.isShouldReplace(), request.getMaxFiles()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(arch);
     }
 
     public static class RarExtractionRequest {
-        // todo: fix
-        // Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Unrecognized token 'abc': was expecting
-        @JsonProperty("should_replace")
-        public boolean shouldReplace = Punctuation.Literal.TRUE_LITERAL;
-        @JsonProperty("max_files")
+        private boolean shouldReplace = Punctuation.Literal.TRUE_LITERAL;
         public int maxFiles = DigitalInformation.StandardFileProperties.MAX_FILES_AVAILABLE;
+
+        public RarExtractionRequest(){}
+
+        public RarExtractionRequest(String shouldReplace, String maxFiles) {
+            this.shouldReplace = handleShouldReplace(shouldReplace);
+            this.maxFiles = handleMaxFiles(maxFiles);
+        }
+
+        @JsonProperty("should_replace")
+        public boolean isShouldReplace() {
+            return shouldReplace;
+        }
+
+        @JsonProperty("max_files")
+        public int getMaxFiles() {
+            return maxFiles;
+        }
+
+        private boolean handleShouldReplace(String shouldReplace) {
+            var toLower = shouldReplace.toLowerCase();
+            if (toLower.equals("true") || toLower.equals("false")) {
+                this.shouldReplace = Boolean.parseBoolean(shouldReplace);
+                return this.shouldReplace;
+            }
+            return this.shouldReplace;
+        }
+
+        private int handleMaxFiles(String maxFiles) {
+            final var onlyNumbers = Pattern.compile("^[0-9]*$");
+            if (onlyNumbers.matcher(maxFiles).find()) {
+                this.maxFiles = Integer.parseInt(maxFiles);
+                return this.maxFiles;
+            }
+            return this.maxFiles;
+        }
     }
 }
