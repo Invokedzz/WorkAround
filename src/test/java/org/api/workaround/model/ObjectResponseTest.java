@@ -3,11 +3,11 @@ package org.api.workaround.model;
 import com.github.junrar.rarfile.RARVersion;
 import org.api.workaround.exception.handler.ExceptionResponse;
 import org.api.workaround.model.enums.DigitalInformation;
+import org.api.workaround.model.enums.OperationStatus;
 import org.api.workaround.util.FileConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -50,16 +50,14 @@ public class ObjectResponseTest {
     class ExtractionResponseTest {
         @Test
         void expectsResponseIfFileListContainsElements() {
-            var extResponse = ExtractionResponse.response(new FileProperties(List.of(extInfo), List.of()));
-            assertEquals("Success! File(s) extracted properly!", extResponse.message());
-            assertEquals(HttpStatus.ACCEPTED.toString(), extResponse.status().toString());
+            var extResponse = ExtractionResponse.response(new FileProperties(OperationStatus.DELIVERED, List.of(extInfo), List.of()));
+            assertEquals(OperationStatus.DELIVERED.toString(), extResponse.properties().status().toString());
             assertNotNull(extResponse.timestamp());
         }
         @Test
         void expectsResponseIfFileListIsEmpty() {
-            var extResponse = ExtractionResponse.response(new FileProperties(List.of(), List.of()));
-            assertEquals("Not a single file was extracted!", extResponse.message());
-            assertEquals(HttpStatus.ACCEPTED.toString(), extResponse.status().toString());
+            var extResponse = ExtractionResponse.response(new FileProperties(OperationStatus.DELIVERED, List.of(), List.of()));
+            assertEquals(OperationStatus.DELIVERED.toString(), extResponse.properties().extract().toString());
             assertNotNull(extResponse.timestamp());
         }
     }
@@ -70,17 +68,17 @@ public class ObjectResponseTest {
         void expectsProperResponse() {
             var toList = exResp.errorMessages().stream().toList();
             assertEquals("error-test-message", toList.getFirst());
-            assertEquals(HttpStatus.BAD_REQUEST.toString(), exResp.httpStatus().toString());
+            assertEquals(OperationStatus.FAILED, exResp.status());
             assertNotNull(exResp.timestamp());
         }
     }
 
     private ExtractionInformation getExtractionInformation(String fileName) {
-       return new ExtractionInformation(fileName, "0" + DigitalInformation.MB, RARVersion.V4);
+       return new ExtractionInformation(fileName, "", "0" + DigitalInformation.MB, RARVersion.V4);
     }
 
     private ExceptionResponse getExceptionResponse() {
         var messages = List.of("error-test-message");
-        return ExceptionResponse.response(messages, HttpStatus.BAD_REQUEST);
+        return ExceptionResponse.response(messages);
     }
 }

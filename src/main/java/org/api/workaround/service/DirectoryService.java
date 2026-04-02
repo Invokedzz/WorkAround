@@ -77,7 +77,7 @@ public class DirectoryService {
         pathUsingAbsolute = file.getAbsolutePath();
         if (TRANSVERSAL_REGEX_CASES.matcher(pathUsingAbsolute).find() || TRANSVERSAL_REGEX_CASES.matcher(pathUsingCanonical).find()) {
             return true;
-        } else if (isAbsolutePathIsNotEqualsToCanon(pathUsingAbsolute, pathUsingCanonical)) {
+        } else if (isAbsolutePathNotEqualsToCanon(pathUsingAbsolute, pathUsingCanonical)) {
             return true;
         }
 
@@ -108,7 +108,7 @@ public class DirectoryService {
         return false;
     }
 
-    private boolean isAbsolutePathIsNotEqualsToCanon(String pathUsingAbsolute, String pathUsingCanonical) {
+    private boolean isAbsolutePathNotEqualsToCanon(String pathUsingAbsolute, String pathUsingCanonical) {
         return !pathUsingAbsolute.equals(pathUsingCanonical);
     }
 

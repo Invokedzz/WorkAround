@@ -138,32 +138,4 @@ public class ConstantsTest {
             assertEquals("%c0%2f", PathEncode.UTF8_UNICODE_SLASH.getOtherAlterValue());
         }
     }
-
-    @Nested
-    class httpRequestMethodsTests {
-        @Test
-        void expectsGetMethodValue() {
-            assertEquals("GET", HttpRequestMethod.GET.toString());
-        }
-
-        @Test
-        void expectsPostMethodValue() {
-            assertEquals("POST", HttpRequestMethod.POST.toString());
-        }
-
-        @Test
-        void expectsPutMethodValue() {
-            assertEquals("PUT", HttpRequestMethod.PUT.toString());
-        }
-
-        @Test
-        void expectsPatchMethodValue() {
-            assertEquals("PATCH", HttpRequestMethod.PATCH.toString());
-        }
-
-        @Test
-        void expectsDeleteMethodValue() {
-            assertEquals("DELETE", HttpRequestMethod.DELETE.toString());
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package org.api.workaround.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.api.workaround.model.ExtractionResponse;
 import org.api.workaround.model.FileProperties;
 import org.api.workaround.model.RarBridgeRequest;
 import org.api.workaround.model.enums.DigitalInformation;
@@ -28,13 +29,14 @@ public class FileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<FileProperties> extractRarFile(
+    public ResponseEntity<ExtractionResponse<FileProperties>> extractRarFile(
             MultipartHttpServletRequest http,
             @RequestPart("request") RarExtractionRequest request
     )
     {
-        var arch = fileService.extractRar(RarBridgeRequest.get(http.getMultiFileMap(), request.isShouldReplace(), request.getMaxFiles()));
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(arch);
+        var fileProp = fileService.extractRar(RarBridgeRequest.get(http.getMultiFileMap(), request.isShouldReplace(), request.getMaxFiles()));
+        var ext = ExtractionResponse.response(fileProp);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ext);
     }
 
     public static class RarExtractionRequest {

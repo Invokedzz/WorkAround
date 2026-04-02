@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -47,7 +46,7 @@ public class FileControllerTest {
     void setupBeforeTests() throws Exception {
         final var file = new File(PATH + Punctuation.SLASH + "rar4.rar");
         mpFile = FileConverter.convertFileToMultipartFile(file);
-        extInfo = new ExtractionInformation("rar4", "0" + DigitalInformation.MB, RARVersion.V4);
+        extInfo = new ExtractionInformation("rar4", "", "0" + DigitalInformation.MB, RARVersion.V4);
     }
 
     @Test

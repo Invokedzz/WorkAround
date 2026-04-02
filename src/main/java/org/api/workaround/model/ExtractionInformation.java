@@ -6,6 +6,8 @@ import com.github.junrar.rarfile.RARVersion;
 public record ExtractionInformation(
         @JsonProperty("file_name")
         String fileName,
+        @JsonProperty("content_type")
+        String contentType,
         @JsonProperty("file_size")
         String fileSize,
         RARVersion version

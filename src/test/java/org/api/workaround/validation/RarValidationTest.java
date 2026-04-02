@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.api.workaround.exception.FileValidationException;
 import org.api.workaround.model.enums.Punctuation;
 import org.api.workaround.util.FileConverter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -25,13 +26,13 @@ public class RarValidationTest {
         var mtFile = FileConverter.convertFileToMultipartFile(file);
         var ex = assertThrows(FileValidationException.class, () -> RarValidation.validate(mtFile));
         var toList = ex.getErrors().stream().toList();
-        assertEquals(3, ex.getErrors().size());
+        assertEquals(2, ex.getErrors().size());
         assertEquals("File cannot be empty!", toList.getFirst());
         assertEquals("Oops! File type needs to be a .RAR or .CBR!", toList.get(1));
-        assertEquals("Invalid file! Make sure you're extracting V4 .RAR/.CBR or lower.", toList.get(2));
     }
 
     @Test
+    @Disabled // V5 is now supported, so this test is being disabled
     void shouldThrowIfRarVersionIsV5() throws IOException {
         final var file = new File(PATH + Punctuation.SLASH + "test_1mb_v5.rar");
         var mtFile = FileConverter.convertFileToMultipartFile(file);

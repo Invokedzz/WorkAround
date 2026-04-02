@@ -1,6 +1,7 @@
 package org.api.workaround.exception.handler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.api.workaround.model.enums.OperationStatus;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -12,17 +13,15 @@ import java.util.List;
 public record ExceptionResponse(
         @JsonProperty("error_messages")
         Collection<String> errorMessages,
-        @JsonProperty("status")
-        HttpStatus httpStatus,
-        ZonedDateTime timestamp
+        OperationStatus status,
+        LocalDateTime timestamp
 )
 {
     /**
      * @param messages group of error messages
-     * @param httpStatus status of the request
      * @return the response
      */
-    public static ExceptionResponse response (Collection<String> messages, HttpStatus httpStatus) {
-        return new ExceptionResponse(messages, httpStatus, LocalDateTime.now().atZone(ZoneId.systemDefault()));
+    public static ExceptionResponse response (Collection<String> messages) {
+        return new ExceptionResponse(messages, OperationStatus.FAILED, LocalDateTime.now(ZoneId.systemDefault()));
     }
 }

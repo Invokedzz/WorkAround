@@ -124,7 +124,6 @@ public class FileService {
             if (isComputerStorageEnoughToExtractFile(directory, reqBytes)) {
                 if (cmf.isFile() && cmf.canRead()) {
                     ExtractionInformation response = null;
-
                     byte[] signature = RarValidation.V5_SIGNATURE;
                     byte[] originalFileBytes = Files.readAllBytes(cmf.toPath());
                     var isRar5 = true;
@@ -203,9 +202,12 @@ public class FileService {
                 if (lastElement != null) {
                     uploads.remove(lastElement);
                 }
-                return;
             }
-            uploads.add(upload);
+            else {
+                var alreadyExists = uploads.stream().anyMatch(e -> e.fileName().equals(upload.fileName()));
+                if (alreadyExists) return;
+                uploads.add(upload);
+            }
         }
     }
 
@@ -280,6 +282,6 @@ public class FileService {
     }
 
     private ExtractionInformation getExtractInfo(MultipartFile file, RARVersion version, String rarSize) throws RarException {
-        return new ExtractionInformation(file.getResource().getFilename(), rarSize, version);
+        return new ExtractionInformation(file.getResource().getFilename(), file.getContentType(), rarSize, version);
     }
 }

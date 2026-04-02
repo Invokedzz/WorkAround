@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileValidationException.class)
     public ResponseEntity<ExceptionResponse> handleValidationException(FileValidationException e) {
-        final var resp = ExceptionResponse.response(e.getErrors(), HttpStatus.BAD_REQUEST);
+        final var resp = ExceptionResponse.response(e.getErrors());
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
@@ -30,12 +30,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
         ExceptionResponse resp = null;
         if (e.getMessage() != null) {
-            resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.BAD_REQUEST);
+            resp = ExceptionResponse.response(List.of(e.getMessage()));
         }
         else {
             if (e.getClass().equals(FailedExtractionException.class)) {
                 final var msg = "Please, enter a valid password in order to extract the file!";
-                resp = ExceptionResponse.response(List.of(msg), HttpStatus.BAD_REQUEST);
+                resp = ExceptionResponse.response(List.of(msg));
             }
         }
         return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileUploadException.class)
     public ResponseEntity<ExceptionResponse> handlePayloadTooLargeException(FileUploadException e) {
-        final var resp = ExceptionResponse.response(List.of(e.getMessage()), HttpStatus.CONTENT_TOO_LARGE);
+        final var resp = ExceptionResponse.response(List.of(e.getMessage()));
         return new ResponseEntity<>(resp, HttpStatus.CONTENT_TOO_LARGE);
     }
 
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
             entityClass = e.getRequiredType().getName();
         }
         final var msg = e.getName() + " field should be of type " + entityClass;
-        final var resp = ExceptionResponse.response(List.of(msg), HttpStatus.UNPROCESSABLE_CONTENT);
+        final var resp = ExceptionResponse.response(List.of(msg));
         return new ResponseEntity<>(resp, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 }
